@@ -1,0 +1,53 @@
+<div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur confirm-dialog ">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+        <h2 class="text-xl font-semibold mb-4">{{modalHeading}}</h2>
+        <form [formGroup]="form">
+            <div class="mb-4">
+                <label for="companyName" class="block text-gray-700">Company Name</label>
+                <input id="companyName" formControlName="companyName" class="w-full mt-1 p-2 border rounded-md">
+            </div>
+            <div formGroupName="address">
+                <div class="mb-4">
+                    <label for="addressLine1" class="block text-gray-700">Address Line 1</label>
+                    <input id="addressLine1" formControlName="addressLine1" class="w-full mt-1 p-2 border rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label for="addressLine2" class="block text-gray-700">Address Line 2</label>
+                    <input id="addressLine2" formControlName="addressLine2" class="w-full mt-1 p-2 border rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label for="city" class="block text-gray-700">City</label>
+                    <input id="city" formControlName="city" class="w-full mt-1 p-2 border rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label for="state" class="block text-gray-700">State</label>
+                    <input id="state" formControlName="state" class="w-full mt-1 p-2 border rounded-md">
+                </div>
+                <div class="mb-4">
+                    <label for="postalCode" class="block text-gray-700">Postal Code</label>
+                    <input id="postalCode" formControlName="postalCode" class="w-full mt-1 p-2 border rounded-md">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="contactNumber" class="block text-gray-700">Phone</label>
+                <input id="contactNumber" formControlName="contactNumber" class="w-full mt-1 p-2 border rounded-md">
+            </div>
+            <div class="mb-4">
+                <label for="contactPerson" class="block text-gray-700">Contact Person</label>
+                <input id="contactPerson" formControlName="contactPerson" class="w-full mt-1 p-2 border rounded-md">
+            </div>
+            <div class="flex justify-end">
+                <button type="button" (click)="close()"
+                    class="mr-4 bg-gray-500 text-white px-4 py-2 rounded-md">Cancel</button>
+                <button *ngIf="action!=='edit'&& action!=='view' " type="button" (click)="save()" class="bg-blue-500 text-white px-4 py-2 rounded-md">Save</button>
+                <button *ngIf="action==='edit'" type="button" (click)="save()"
+                    class="bg-blue-500 text-white px-4 py-2 rounded-md">Update</button>
+            </div>
+            <div *ngIf="message"
+                [ngClass]="{ 'text-green-500': messageType === 'success', 'text-red-500': messageType === 'error' }"
+                class="mt-4 text-center">
+                {{ message }}
+            </div>
+        </form>
+    </div>
+</div>

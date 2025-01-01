@@ -1,0 +1,237 @@
+<div class="container">
+    <div class="card">
+        <div class="form">
+            <div class="left-side">
+                <div class="left-heading">
+
+                </div>
+                <div class="steps-content">
+                    <img src="logo.png" alt="metaVite logo">
+
+                    <p class="step-number-content d-none">Get to know better by adding your diploma,certificate and
+                        education life.</p>
+                    <p class="step-number-content d-none">Help companies get to know you better by telling then about
+                        your past experiences.</p>
+                    <p class="step-number-content d-none">Add your profile piccture and let companies find youy fast.
+                    </p>
+                </div>
+                <ul *ngIf="endUser_role !== 'appAdmin'" class="progress-bar">
+
+                    <li  [ngClass]="step.stepName==activeStep.stepName?'active':''" *ngFor="let step of stepsList">
+                        {{step.stepName}}</li>
+
+                </ul>
+
+            </div>
+            <div *ngIf="endUser_role !== 'appAdmin'">
+
+<div class=" active" *ngIf="activeStep.index == 1">
+    <app-role-selection [fields]="fields" [formGroup]="registrationForm" (endUserSelectionEvent)="selectEndUser($event)"
+        [submitEvent]="submitEvent"></app-role-selection>
+    <div class="mb-4" *ngIf="endUser_role">
+        <app-button (nextStageEvent)="incrementIndexOfRole($event) " [buttonStatus]="buttonStatus"></app-button>
+    </div>
+
+
+</div>
+
+<!-- /THIS SECTION IS FOR THE DRIVER AND STAFF -->
+<!-- STEP 2 -->
+<div class="main active" *ngIf="activeStep.index == 2 && (endUser_role == 'shipperStaff' || endUser_role == 'driver')">
+    <app-user-personal [submitEvent]="submitEvent" (buttonActivate)="handleButtonStatus($event)"></app-user-personal>
+    <div class="flex justify-between">
+    <app-button class="w-1/2" (nextStageEvent)="decrementIndexOfRole($event)" label="Previous" [buttonStatus]="buttonStatus"></app-button>
+    <app-button class="w-1/2" (nextStageEvent)="incrementIndexOfRole($event)" label="Next" [buttonStatus]="buttonStatus"></app-button>
+    </div>
+
+
+</div>
+
+<!-- STEP 3 -->
+<div class="main active" *ngIf="activeStep.index == 3 && (endUser_role == 'shipperStaff' || endUser_role == 'driver')">
+    <app-address [submitEvent]="submitEvent" [userRole]=endUser_role (buttonActivate)="handleButtonStatus($event)"></app-address>
+    <div class="flex justify-between">
+        <app-button class="w-1/2" (nextStageEvent)="decrementIndexOfRole($event)" label="Previous"[buttonStatus]="buttonStatus"></app-button>
+        <app-button class="w-1/2" (nextStageEvent)="incrementIndexOfRole($event)" label="Next" [buttonStatus]="buttonStatus"></app-button>
+    </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="main active" *ngIf="activeStep.index == 4 && (endUser_role == 'shipperStaff' || endUser_role == 'driver')">
+    <app-password [submitEvent]="submitEvent" [userRole]=endUser_role (buttonActivate)="handleButtonStatus($event)"></app-password>
+    <div class="flex justify-between">
+        <app-button class="w-1/2" (nextStageEvent)="decrementIndexOfRole($event)" label="Previous" [buttonStatus]="buttonStatus"></app-button>
+        <app-button class="w-1/2" (nextStageEvent)="incrementIndexOfRole($event)" [buttonStatus]="buttonStatus" label="Submit"></app-button>
+    </div>
+    
+</div>
+
+<!-- STEP 5 -->
+<div class="main active" *ngIf="activeStep.index == 5 && (endUser_role == 'shipperStaff' || endUser_role == 'driver')">
+    
+    <div class="demo1">
+    
+    
+        <div class="demo1">
+            <svg viewBox="0 0 87 87" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Group-2" transform="translate(2.000000, 2.000000)">
+                        <circle id="Oval-2" stroke="rgba(252, 191, 191, .5)" stroke-width="4" cx="41.5" cy="41.5" r="41.5">
+                        </circle>
+                        <circle class="ui-error-circle" stroke="#F74444" stroke-width="4" cx="41.5" cy="41.5" r="41.5">
+                        </circle>
+                        <path class="ui-error-line1" d="M22.244224,22 L60.4279902,60.1837662" id="Line" stroke="#F74444"
+                            stroke-width="3" stroke-linecap="square"></path>
+                        <path class="ui-error-line2" d="M60.755776,21 L23.244224,59.8443492" id="Line" stroke="#F74444"
+                            stroke-width="3" stroke-linecap="square"></path>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+
+    <div class="text congrats">
+        <h2>Sorry!</h2>
+        <p>Thanks Mr./Mrs. <span class="shown_name"></span> your information have been submitted
+            successfully for the future reference we will contact you soon.</p>
+    </div>
+</div>
+
+
+
+
+<!-- /THIS SECTION IS FOR THE ADMINS -->
+
+<!-- STEP 2 -->
+<div class="main active"
+    *ngIf="activeStep.index == 2 && (endUser_role == 'shipperAdmin' || endUser_role == 'carrierAdmin')">
+    <app-persoanl-info [submitEvent]="submitEvent" [userRole]=endUser_role (buttonActivate)="handleButtonStatus($event)"> </app-persoanl-info>
+    <div class="flex justify-between">
+<app-button class="w-1/2" (nextStageEvent)="decrementIndexOfRole($event)" label="Previous" [buttonStatus]="buttonStatus"></app-button>
+<app-button class="w-1/2" (nextStageEvent)="incrementIndexOfRole($event)" [buttonStatus]="buttonStatus"></app-button>
+
+    </div>
+    
+</div>
+<!-- STEP 3 -->
+<div class="main active"
+    *ngIf="activeStep.index == 3 && (endUser_role == 'shipperAdmin' || endUser_role == 'carrierAdmin')">
+    <app-address [submitEvent]="submitEvent" [userRole]=endUser_role (buttonActivate)="handleButtonStatus($event)"></app-address>
+
+    <div class="flex justify-between">
+    <app-button class="w-1/2" (nextStageEvent)="decrementIndexOfRole($event)" label="Previous" [buttonStatus]="buttonStatus"></app-button>
+    <app-button class="w-1/2" (nextStageEvent)="incrementIndexOfRole($event)" [buttonStatus]="buttonStatus"></app-button>
+        </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="main active"
+    *ngIf="activeStep.index == 4 && (endUser_role == 'shipperAdmin' || endUser_role == 'carrierAdmin')">
+    <app-user-personal [submitEvent]="submitEvent" (buttonActivate)="handleButtonStatus($event)"></app-user-personal>
+    <div class="flex justify-between">
+    <app-button class="w-1/2" (nextStageEvent)="decrementIndexOfRole($event)" label="Previous" [buttonStatus]="buttonStatus"></app-button>
+    <app-button class="w-1/2" (nextStageEvent)="incrementIndexOfRole($event)" [buttonStatus]="buttonStatus"></app-button>
+    </div>
+</div>
+<!-- STEP 5 -->
+<div class="main active"
+    *ngIf="activeStep.index == 5 && (endUser_role == 'shipperAdmin' || endUser_role == 'carrierAdmin')">
+    <app-password [submitEvent]="submitEvent" [userRole]=endUser_role (buttonActivate)="handleButtonStatus($event)"></app-password>
+    <div class="flex justify-between">
+<app-button class="w-1/2" (nextStageEvent)="decrementIndexOfRole($event)" label="Previous" [buttonStatus]="buttonStatus"></app-button>
+<app-button class="w-1/2" (nextStageEvent)="incrementIndexOfRole($event)" label="Submit" [buttonStatus]="buttonStatus"></app-button>
+
+    </div>
+   
+</div>
+
+<!--    STEP 6    -->
+<div class="main active"
+    *ngIf="activeStep.index == 6 && (endUser_role == 'shipperAdmin' || endUser_role == 'carrierAdmin')">
+    <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+    </svg>
+
+    <div class="text congrats">
+        <h2>Congratulations!</h2>
+        <p>Thanks Mr./Mrs. <span class="shown_name"></span> your information have been submitted
+            successfully for the future reference we will contact you soon.</p>
+    </div>
+</div>
+
+
+            </div>
+           <div *ngIf="endUser_role == 'appAdmin' && isCompleted===false">
+
+       <app-app-admin (messageEvent)="handleMessage($event)" (formStatusEvent)="handleButtonStatus($event)"  [submitEvent]="submitEvent" [userRole]=endUser_role></app-app-admin>
+    <app-button (nextStageEvent)="incrementIndexOfRole($event)" label="Submit"[buttonStatus]="buttonStatus" ></app-button>
+
+           </div>
+        <div class="main active"
+            *ngIf="endUser_role==='appAdmin' && registrationStatus && isCompleted">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+            </svg>
+        
+            <div class="text congrats">
+                <h2>{{registrationMessage}}</h2>
+                <p>Thanks Mr./Mrs. <span class="shown_name">{{firstName}}</span> your information have been submitted
+                    successfully for the future reference we will contact you soon.</p>
+            </div>
+            <div class="flex justify-center ">
+                <button class="w-1/3 bg-green-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg mt-4 focus:outline-none"
+                    (click)="navigateToLogin('admin')">
+                    Back To Login
+                </button>
+            
+            </div>
+        </div>
+<div class="main active" *ngIf="endUser_role==='appAdmin' && registrationStatus===false && isCompleted">
+    <div class="demo1">
+    
+    
+        <div class="demo1">
+            <svg viewBox="0 0 87 87" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Group-2" transform="translate(2.000000, 2.000000)">
+                        <circle id="Oval-2" stroke="rgba(252, 191, 191, .5)" stroke-width="4" cx="41.5" cy="41.5" r="41.5">
+                        </circle>
+                        <circle class="ui-error-circle" stroke="#F74444" stroke-width="4" cx="41.5" cy="41.5" r="41.5">
+                        </circle>
+                        <path class="ui-error-line1" d="M22.244224,22 L60.4279902,60.1837662" id="Line" stroke="#F74444"
+                            stroke-width="3" stroke-linecap="square"></path>
+                        <path class="ui-error-line2" d="M60.755776,21 L23.244224,59.8443492" id="Line" stroke="#F74444"
+                            stroke-width="3" stroke-linecap="square"></path>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </div>
+    
+    
+    <div class="text congrats">
+        <h2>{{registrationMessage}}</h2>
+        <p>Thanks Mr./Mrs. <span class="shown_name">user</span> You have encountered an Error Please Try again.</p>
+    </div>
+    <div class="flex justify-center ">
+    <button class="w-1/3 bg-green-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg mt-4 focus:outline-none"
+        (click)="navigateToRegister()">
+        Try Again
+    </button>
+
+    </div>
+    
+    
+</div>
+
+
+        </div>
+
+    </div>
+
+</div>

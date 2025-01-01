@@ -1,0 +1,64 @@
+<div class="p-4 m-4 bg-gray-100 rounded-lg shadow-lg">
+    <!-- Header -->
+    <div class="relative m-2.5 items-center flex justify-center text-white h-24 rounded-md bg-slate-800">
+        <h3 class="text-2xl">{{data.heading}}</h3>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="invitationForm" (ngSubmit)="onSubmit()"
+        class="font-[sans-serif] max-w-4xl mx-auto bg-white p-6 rounded-lg">
+        <div formGroupName="name" class="grid sm:grid-cols-2 gap-4 mb-4">
+            <div class="relative flex flex-col">
+                <input formControlName="firstName" type="text" placeholder="First Name"
+                    class="px-4 py-3 bg-[#f0f1f2] focus:bg-transparent text-black w-full text-sm border outline-[#007bff] rounded transition-all mb-4" />
+                <div *ngIf="nameControls.firstName.touched && nameControls.firstName.invalid"
+                    class="text-red-500 text-xs mt-1">
+                    <div *ngIf="nameControls.firstName.errors?.required">First Name is required.</div>
+                    <div *ngIf="nameControls.firstName.errors?.minlength">First Name must be at least 3 characters long.
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative flex flex-col">
+                <input formControlName="lastName" type="text" placeholder="Last Name"
+                    class="px-4 py-3 bg-[#f0f1f2] focus:bg-transparent text-black w-full text-sm border outline-[#007bff] rounded transition-all mb-4" />
+                <div *ngIf="nameControls.lastName.touched && nameControls.lastName.invalid"
+                    class="text-red-500 text-xs mt-1">
+                    <div *ngIf="nameControls.lastName.errors?.required">Last Name is required.</div>
+                    <div *ngIf="nameControls.lastName.errors?.minlength">Last Name must be at least 3 characters long.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email -->
+        <div class="relative flex flex-col mb-4">
+            <input formControlName="email" type="text" placeholder="Email"
+                class="px-4 py-3 bg-[#f0f1f2] focus:bg-transparent text-black w-full text-sm border outline-[#007bff] rounded transition-all mb-4" />
+            <div *ngIf="f.email.touched && f.email.invalid" class="text-red-500 text-xs mt-1">
+                <div *ngIf="f.email.errors?.required">Email is required.</div>
+                <div *ngIf="f.email.errors?.email">Invalid email format.</div>
+            </div>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="relative flex flex-col mb-4">
+            <input formControlName="phoneNumber" type="text" placeholder="Phone Number"
+                class="px-4 py-3 bg-[#f0f1f2] focus:bg-transparent text-black w-full text-sm border outline-[#007bff] rounded transition-all mb-4" />
+            <div *ngIf="f.phoneNumber.touched && f.phoneNumber.invalid" class="text-red-500 text-xs mt-1">
+                <div *ngIf="f.phoneNumber.errors?.required">Phone Number is required.</div>
+                <div *ngIf="f.phoneNumber.errors?.pattern">Phone Number must be a valid Indian number.</div>
+            </div>
+        </div>
+
+        
+
+        <!-- Submit Button -->
+        <button type="submit" [disabled]="invitationForm.invalid"
+            class="mt-8 px-6 py-2.5 text-sm w-full bg-[#007bff] hover:bg-[#006bff] text-white rounded transition-all disabled:bg-gray-300 disabled:cursor-not-allowed">
+            Submit
+        </button>
+    </form>
+
+    <!-- Footer -->
+</div>

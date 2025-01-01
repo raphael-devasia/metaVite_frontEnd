@@ -1,1 +1,172 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'ngx-toastr/toastr';
+
+
+html,
+body {
+  box-sizing: border-box;
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "YourGlobalFontFamily"; /* Replace 'YourGlobalFontFamily' with the actual font-family */
+  font-size: 16px;
+  /* background-color: "#f8f8f8";  */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100vw;
+  height: 100vh;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  transition: all 0.25s ease-in-out;
+}
+
+a,
+a:visited,
+a:active {
+  text-decoration: none;
+  color: "#838383"; /* Replace with actual color code for $bright-manatee */
+  font-size: 1.125rem; /* Replace with the actual font size for body-primary-l */
+}
+
+.btn {
+  display: inline-block;
+  min-height: 2.5rem;
+  min-width: 6rem;
+  background-color: "#007bff"; /* Replace with actual color code for $sub-nautical */
+  color: "#ffffff"; /* Replace with actual color code for $bright-white */
+  font-size: 0.875rem; /* Replace with the actual font size for body-primary-xs */
+  border: none;
+  border-radius: 0.25rem;
+}
+
+h1 {
+  font-size: 2.25rem; /* Replace with the actual font size for heading-m */
+}
+
+h2,
+h3 {
+  font-size: 1.125rem; /* Replace with the actual font size for body-primary-s */
+}
+
+p {
+  font-size: 1.125rem; /* Replace with the actual font size for body-primary-l */
+  text-align: center;
+  margin: 2rem 1rem 6rem 1rem;
+}
+
+ul {
+  list-style: none;
+}
+
+span {
+  
+}
+
+mat-card {
+  position: absolute;
+  top: -5rem;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  background-color: "#ffffff" !important; /* Replace with actual color code for $bright-white */
+  width: 21.5rem;
+  height: fit-content;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  box-shadow: 0 1.5rem 2.5rem -1.25rem rgba(0, 0, 0, 0.0951141);
+  border-radius: 0.625rem !important;
+  text-align: left;
+}
+
+.mat-mdc-card-content:last-child {
+  padding-bottom: 0 !important;
+}
+
+.mat-mdc-card-header,
+.mat-mdc-card-content {
+  padding: 0 !important;
+}
+
+mat-card-title {
+  font-size: 2.25rem; /* Replace with the actual font size for heading-m */
+  margin-bottom: 0.56rem !important;
+}
+
+mat-card-subtitle {
+  font-size: 1.125rem; /* Replace with the actual font size for body-primary-l */
+  margin-bottom: 1rem !important;
+}
+
+.alert-danger {
+  display: contents;
+}
+
+mat-card-content > input:hover,
+a:hover,
+mat-toggle:hover,
+mat-checkbox:hover,
+button:hover {
+  cursor: pointer;
+}
+
+@media (min-width: 37.5em) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  mat-card,
+  mat-card-title,
+  mat-card-subtitle,
+  mat-card-content,
+  mat-card-content input,
+  mat-card-content label .mat-mdc-card-content,
+  form,
+  .column {
+    width: 28.125rem;
+  }
+
+  mat-card {
+    position: relative;
+    top: 0rem;
+    padding: 0;
+    box-shadow: none;
+    align-items: flex-start;
+  }
+
+  mat-card-title {
+    font-size: 2rem;
+    line-height: 2.3rem;
+  }
+
+  mat-card-subtitle {
+    margin-bottom: 2.3rem;
+  }
+
+  .mat-mdc-card-content {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .btn {
+    height: 3rem;
+    width: 7.7rem;
+  }
+}
+

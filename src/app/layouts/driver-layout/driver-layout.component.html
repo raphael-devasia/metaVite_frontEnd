@@ -1,0 +1,24 @@
+<div class="flex h-full">
+    <div *ngIf="status ==='Pending'" class="w-1/6 h-full">
+        <app-sidebar [buttonTexts]="buttonTexts" (buttonClick)="onSidebarButtonClick($event)"></app-sidebar>
+    </div>
+    <div *ngIf="isBoardingSuccess ==='success' && status !=='Pending'" class="w-1/6 h-full">
+        <app-sidebar [buttonTexts]="activeButtonTexts" (buttonClick)="onSidebarButtonClick($event)"></app-sidebar>
+    </div>
+    <div class="w-5/6 h-full" *ngIf="isBoardingSuccess ==='active'">
+        <app-form [formGroup]="personalInfoForm" [formTitle]="formTitle" [personalInformation]="personalInformation"
+            [bankDetails]="bankDetails"  [additionalInformation]="additionalInformation"
+            [address]="address" (isOn_BoardingSuccess)="isOn_BoardingSuccess($event)">
+        </app-form>
+    </div>
+    <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'My Loads'">
+        <app-table [tabledata]="shipmentTableData"></app-table>
+    </div>
+    <div class="w-5/6 h-full flex justify-center items-center" *ngIf="isBoardingSuccess ==='success' && status=='Pending'">
+        <app-success></app-success>
+    </div>
+    <div class="w-5/6 h-full flex justify-center items-center" *ngIf="isBoardingSuccess ==='error'">
+        
+    </div>
+</div>
+

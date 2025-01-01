@@ -1,0 +1,24 @@
+<div class="w-full p-4 text-center bg-white  border-gray-200 rounded-lg  sm:p-8 dark:bg-gray-800 dark:border-gray-700" [formGroup]="formGroup"
+    >
+    
+    <h5 class="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Select A Role</h5>
+    <p class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">
+        Please select the role that best describes your position within the company:
+    </p>
+    <div class="flex items-center justify-center space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
+        <button (click)="selectUserRole(fields[0].endUser)" class="app-button" [ngClass]="{'active': isSelected(fields[0].endUser)}" >
+            <div class="text-left rtl:text-right">
+                <div class="font-sans text-sm font-semibold">{{fields[0].text}}</div>
+            </div>
+        </button>
+        <button (click)="selectUserRole(fields[1].endUser)" class="app-button " [ngClass]="{'active': isSelected(fields[1].endUser)}" >
+            <div class="text-left rtl:text-right">
+                <div class="font-sans text-sm font-semibold">{{fields[1].text}}</div>
+            </div>
+        </button>
+
+    </div>
+ 
+
+
+</div>

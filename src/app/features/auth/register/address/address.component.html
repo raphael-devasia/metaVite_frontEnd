@@ -1,0 +1,55 @@
+<div class="bg-white p-6">
+    <h2 class="text-lg font-medium mb-6">Address Details</h2>
+    <form [formGroup]="formGroup">
+        <div class="grid grid-cols-2 gap-6">
+            <div class="col-span-2 sm:col-span-1">
+                <label for="address-line1" class="block text-sm font-medium text-gray-700 mb-2">Address Line 1</label>
+                <input formControlName="addressLine1" type="text" name="address-line1" id="address-line1"
+                    placeholder="Enter address line 1"
+                    class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500">
+                <div *ngIf="formGroup.get('addressLine1')?.touched && formGroup.get('addressLine1')?.invalid"
+                    class="text-red-500 text-sm mt-1">
+                    Address Line 1 is required.
+                </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+                <label for="address-line2" class="block text-sm font-medium text-gray-700 mb-2">Address Line 2</label>
+                <input formControlName="addressLine2" type="text" name="address-line2" id="address-line2"
+                    placeholder="Enter address line 2"
+                    class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500">
+                <div *ngIf="formGroup.get('addressLine2')?.touched && formGroup.get('addressLine2')?.invalid"
+                    class="text-red-500 text-sm mt-1">
+                    Address Line 2 is required.
+                </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+                <label for="city" class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                <input formControlName="city" type="text" name="city" id="city" placeholder="Enter city"
+                    class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500">
+                <div *ngIf="formGroup.get('city')?.touched && formGroup.get('city')?.invalid"
+                    class="text-red-500 text-sm mt-1">
+                    City is required.
+                </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+                <label for="state" class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                <input formControlName="state" type="text" name="state" id="state" placeholder="Enter state"
+                    class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500">
+                <div *ngIf="formGroup.get('state')?.touched && formGroup.get('state')?.invalid"
+                    class="text-red-500 text-sm mt-1">
+                    State is required.
+                </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+                <label for="postal-code" class="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                <input formControlName="postalCode" type="text" name="postal-code" id="postal-code"
+                    placeholder="Enter postal code"
+                    class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500">
+                <div *ngIf="formGroup.get('postalCode')?.touched && formGroup.get('postalCode')?.invalid"
+                    class="text-red-500 text-sm mt-1">
+                    Postal Code is required.
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

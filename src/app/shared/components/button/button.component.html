@@ -1,0 +1,19 @@
+<!-- <div class="flex justify-center btnstyle" >
+    <button type="submit" (click)="changeTheIndex()" [disabled]="!isButtonActive"
+        class="w-1/2 bg-green-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg focus:outline-none">
+        {{label}}
+    </button>
+</div> -->
+
+<div class="flex justify-center btnstyle">
+    <button type="submit" (click)="changeTheIndex()" [disabled]="!isButtonActive"
+        [class.bg-blue-500]="label === 'Previous' && isButtonActive" 
+        [class.bg-green-500]="label !== 'Previous' && isButtonActive" 
+        [class.bg-gray-400]="!isButtonActive"
+        [class.hover:bg-blue-600]="label === 'Previous' && isButtonActive"
+        [class.hover:bg-green-600]="label !== 'Previous' && isButtonActive"
+        [class.cursor-not-allowed]="!isButtonActive"
+        class="w-1/2 text-white font-medium py-3 rounded-lg focus:outline-none">
+        {{ label }}
+    </button>
+</div>

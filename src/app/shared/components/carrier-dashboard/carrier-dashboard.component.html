@@ -1,0 +1,192 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Total Open Bids Card -->
+            <div class="bg-white shadow-xl rounded-lg p-6 border border-gray-200">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-yellow-500 text-white p-4 rounded-full shadow-md">
+                        <i class="material-icons">insert_chart</i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Open Bids</p>
+                        <h3 class="text-2xl font-semibold text-gray-800">4</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Closed Bids Card -->
+            <div class="bg-white shadow-xl rounded-lg p-6 border border-gray-200">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-green-500 text-white p-4 rounded-full shadow-md">
+                        <i class="material-icons">check_circle</i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Closed Bids</p>
+                        <h3 class="text-2xl font-semibold text-gray-800">6</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Shipments Card -->
+            <div class="bg-white shadow-xl rounded-lg p-6 border border-gray-200">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500 text-white p-4 rounded-full shadow-md">
+                        <i class="material-icons">local_shipping</i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Shipments</p>
+                        <h3 class="text-2xl font-semibold text-gray-800">4</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Loads Card -->
+            <div class="bg-white shadow-xl rounded-lg p-6 border border-gray-200">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-red-500 text-white p-4 rounded-full shadow-md">
+                        <i class="material-icons">done_all</i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Completed Loads</p>
+                        <h3 class="text-2xl font-semibold text-gray-800">{{totalLoadsDelivered}}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class=" gap-6 mt-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card for Daily Sales -->
+                <div class="card bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div class="chart-container">
+                        <canvas baseChart [data]="statusChartData" [options]="statusChartOptions" [type]="'doughnut'">
+                        </canvas>
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="text-xl font-semibold text-gray-800">Email Subscriptions</h5>
+                        <p class="text-sm text-gray-500">Last Campaign Performance</p>
+                    </div>
+
+                </div>
+
+                <div class="card bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div class="card-header bg-gradient-to-r from-yellow-50 to-yellow-200 text-white p-4">
+                        <div class="chart-container">
+                            <canvas baseChart [data]="paymentsChartData" [options]="paymentsChartOptions"
+                                [type]="'bar'">
+                            </canvas>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="text-xl font-semibold text-gray-800">Shipper Payment</h5>
+                        <p class="text-sm text-gray-500">Last Campaign Performance</p>
+                    </div>
+
+                </div>
+
+                <div class="card bg-white shadow-lg rounded-lg overflow-hidden">
+
+                    <div class="chart-container">
+
+                        <canvas baseChart [data]="barChartData" [options]="barChartOptions" [type]="'bar'">
+                        </canvas>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <h5 class="text-xl font-semibold text-gray-800">Completed Loads</h5>
+                        <p class="text-sm text-gray-500">Last Campaign Performance</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+            <!-- Shipper Payment Summary Table -->
+            <div class="bg-white shadow-xl rounded-lg border border-gray-200 overflow-hidden">
+                <div class="p-4 bg-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-800">Shipper Payment Summary</h3>
+                    <p class="text-sm text-gray-500">Overview of payments made to carriers</p>
+                </div>
+                <table class="table-auto w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="p-3 font-semibold">Shipper Name</th>
+                            <th class="p-3 font-semibold">Total Loads Delivered</th>
+                            <th class="p-3 font-semibold">Amount Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let carrier of topCarriers" class="border-t">
+                            <td class="p-3">{{ carrier.name }}</td>
+                            <td class="p-3">{{ carrier.loads }}</td>
+                            <td class="p-3">${{ carrier.amount }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+            <!-- Additional Payment Metrics Table -->
+            <div class="bg-white shadow-xl rounded-lg border border-gray-200 overflow-hidden">
+                <div class="p-4 bg-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-800">Payment Metrics</h3>
+                    <p class="text-sm text-gray-500">Detailed statistics</p>
+                </div>
+                <table class="table-auto w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="p-3 font-semibold">Metric</th>
+                            <th class="p-3 font-semibold">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-t">
+                            <td class="p-3">Total Shippers</td>
+                            <td class="p-3">{{totalCarriers}}</td>
+                        </tr>
+                        <tr class="border-t">
+                            <td class="p-3">Total Loads Delivered</td>
+                            <td class="p-3">{{totalLoadsDelivered}}</td>
+                        </tr>
+                        <tr class="border-t">
+                            <td class="p-3">Total Amount Paid</td>
+                            <td class="p-3">{{totalAmountPaid}}</td>
+                        </tr>
+                        <tr class="border-t">
+                            <td class="p-3">Highest Paid Shipper</td>
+                            <td class="p-3">{{highestPaidCarrier?.name}} ({{highestPaidCarrier?.amount}})</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-8">
+   
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
+        <app-dashboard-table [bidTableData]="bidTableData"></app-dashboard-table>
+    </div>
+
+    
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
+        <app-dashboard-table [bidTableData]="shipmentTableData"></app-dashboard-table>
+    </div>
+</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+           
+            <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
+                <app-dashboard-table [bidTableData]="clientTableData"></app-dashboard-table>
+            </div>
+
+            
+            <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
+                <app-dashboard-table [bidTableData]="pickupTableData"></app-dashboard-table>
+            </div>
+        </div> -->
+
+
+
+
+    </div>
+</div>

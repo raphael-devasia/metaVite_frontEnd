@@ -1,0 +1,40 @@
+<section id="features" class="container mx-auto px-4 space-y-6 bg-slate-50 py-8 md:py-12 lg:py-20">
+    <div class="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
+        <h2 class="font-bold text-3xl leading-[1.1] sm:text-3xl md:text-6xl">Choose One</h2>
+    </div>
+
+    <div class="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+        <button routerLink="/shipper"
+            class="relative overflow-hidden rounded-lg border bg-white select-none hover:shadow hover:shadow-teal-200 p-2 text-left w-full">
+            <div class="flex flex-col justify-center items-center h-[180px] p-6">
+                <mat-icon class="w-16 h-16 text-indigo-500">business</mat-icon>
+                <div class="space-y-2 text-center">
+                    <h3 class="font-bold">Shipper</h3>
+                    <p class="text-sm text-muted-foreground"></p>
+                </div>
+            </div>
+        </button>
+
+        <button routerLink="/carrier"
+            class="relative overflow-hidden rounded-lg border bg-white select-none hover:shadow hover:shadow-teal-200 p-2 text-left w-full">
+            <div class="flex flex-col justify-center items-center h-[180px] p-6">
+                <mat-icon class="w-16 h-16 text-purple-500">local_shipping</mat-icon>
+                <div class="space-y-2 text-center">
+                    <h3 class="font-bold">Carrier</h3>
+                    <p class="text-sm"></p>
+                </div>
+            </div>
+        </button>
+
+        <button routerLink="/admin"
+            class="relative overflow-hidden rounded-lg border bg-white select-none hover:shadow hover:shadow-teal-200 p-2 text-left w-full">
+            <div class="flex flex-col justify-center items-center h-[180px] p-6">
+                <mat-icon class="w-16 h-16 text-red-500">admin_panel_settings</mat-icon>
+                <div class="space-y-2 text-center">
+                    <h3 class="font-bold">Admin</h3>
+                    <p class="text-sm text-muted-foreground"></p>
+                </div>
+            </div>
+        </button>
+    </div>
+</section>

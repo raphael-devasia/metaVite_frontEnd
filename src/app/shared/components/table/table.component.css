@@ -1,0 +1,29 @@
+
+.mat-mdc-dialog-surface {
+  background-color: #f0f1f2; /* Custom background color */
+  padding: 20px; /* Add padding */
+  border-radius: 8px; /* Optional: Add rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for depth */
+}
+
+.mdc-dialog__surface {
+  /* Additional styles if needed */
+}
+.active-tab {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.hidden {
+  display: none;
+}
+
+.table-fixed {
+    table-layout: auto; /* Automatically adjust column width */
+    width: 100%; /* Make sure the table spans the full width */
+}
+
+th, td {
+    word-wrap: break-word; /* Ensures long text breaks within the column */
+    overflow-wrap: break-word;
+}

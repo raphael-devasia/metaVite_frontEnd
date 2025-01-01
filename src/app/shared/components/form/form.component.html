@@ -1,0 +1,563 @@
+<div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <form class="w-full" [formGroup]="formGroup">
+        <h2 class="text-xl font-semibold mb-4">{{ formTitle }}</h2>
+
+        <!-- Personal Information Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div *ngFor="let field of personalInformation">
+                <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                    class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    [placeholder]="field.placeholder" [disabled]="field.disabled || false" />
+                <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                    class="mt-1">
+                    <small *ngIf="formGroup.get(field.id)?.errors?.['required']" class="text-red-600">
+                        This field is required
+                    </small>
+                    <small *ngIf="formGroup.get(field.id)?.errors?.['pattern']" class="text-red-600">
+                        Please enter a valid format
+                    </small>
+                </div>
+            </div>
+        </div>
+        <!-- Personal Information Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div *ngFor="let field of personalInformation">
+                <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                    class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    [placeholder]="field.placeholder" [disabled]="field.disabled || false" />
+                <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                    class="mt-1">
+                    <small *ngIf="formGroup.get(field.id)?.errors?.['required']" class="text-red-600">
+                        This field is required
+                    </small>
+                    <small *ngIf="formGroup.get(field.id)?.errors?.['pattern']" class="text-red-600">
+                        Please enter a valid format
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <hr *ngIf="isBoardingActive" class="my-6">
+
+        <!-- Additional Information Section -->
+        <div *ngIf="isBoardingActive && role !== 'shipperAdmin' &&dataToShow !=='Trucks' ">
+            <h2 class="text-xl font-semibold mb-4">Additional Information</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of additionalInformation">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+
+                        <!-- Required error -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('required')" class="text-red-600">
+                            This field is required.
+                        </small>
+
+                        <!-- Pattern error (if applicable) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pattern')" class="text-red-600">
+                            Invalid format. Please check the input.
+                        </small>
+
+                        <!-- Custom error for future date -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pastDate')" class="text-red-600">
+                            The date must be in the future.
+                        </small>
+
+                        <!-- Other specific validation errors (if needed) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('minlength')" class="text-red-600">
+                            Minimum length requirement not met.
+                        </small>
+
+                        <small *ngIf="formGroup.get(field.id)?.hasError('maxlength')" class="text-red-600">
+                            Maximum length exceeded.
+                        </small>
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('required')" class="text-red-600">
+                            Date of birth is required.
+                        </small>
+
+                        <!-- Age validation error -->
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('underAge')" class="text-red-600">
+                            You must be at least 18 years old.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Display validation errors -->
+
+
+
+
+
+
+
+            <hr class="my-6">
+        </div>
+        <!-- Vehicle Information Section -->
+        <div *ngIf="dataToShow ==='Trucks' ">
+            <h2 class="text-xl font-semibold mb-4">Vehicle Details</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of vehicleDetails">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+
+                        <!-- Required error -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('required')" class="text-red-600">
+                            This field is required.
+                        </small>
+
+                        <!-- Pattern error (if applicable) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pattern')" class="text-red-600">
+                            Invalid format. Please check the input.
+                        </small>
+
+                        <!-- Custom error for future date -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pastDate')" class="text-red-600">
+                            The date must be in the future.
+                        </small>
+
+                        <!-- Other specific validation errors (if needed) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('minlength')" class="text-red-600">
+                            Minimum length requirement not met.
+                        </small>
+
+                        <small *ngIf="formGroup.get(field.id)?.hasError('maxlength')" class="text-red-600">
+                            Maximum length exceeded.
+                        </small>
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('required')" class="text-red-600">
+                            Date of birth is required.
+                        </small>
+
+                        <!-- Age validation error -->
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('underAge')" class="text-red-600">
+                            You must be at least 18 years old.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Display validation errors -->
+
+
+
+
+
+
+
+            <hr class="my-6">
+        </div>
+        <!-- Vehicle Specification Section -->
+        <div *ngIf="dataToShow ==='Trucks' ">
+            <h2 class="text-xl font-semibold mb-4">Vehicle Specification</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of vehicleSpecifications">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+
+                        <!-- Required error -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('required')" class="text-red-600">
+                            This field is required.
+                        </small>
+
+                        <!-- Pattern error (if applicable) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pattern')" class="text-red-600">
+                            Invalid format. Please check the input.
+                        </small>
+
+                        <!-- Custom error for future date -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pastDate')" class="text-red-600">
+                            The date must be in the future.
+                        </small>
+
+                        <!-- Other specific validation errors (if needed) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('minlength')" class="text-red-600">
+                            Minimum length requirement not met.
+                        </small>
+
+                        <small *ngIf="formGroup.get(field.id)?.hasError('maxlength')" class="text-red-600">
+                            Maximum length exceeded.
+                        </small>
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('required')" class="text-red-600">
+                            Date of birth is required.
+                        </small>
+
+                        <!-- Age validation error -->
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('underAge')" class="text-red-600">
+                            You must be at least 18 years old.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Display validation errors -->
+
+
+
+
+
+
+
+            <hr class="my-6">
+        </div>
+        <!-- Vehicle registration Section -->
+        <div *ngIf="dataToShow ==='Trucks' ">
+            <h2 class="text-xl font-semibold mb-4">Vehicle Registration and License</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of registrationAndLicensing">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+        
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+        
+                        <!-- Required error -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('required')" class="text-red-600">
+                            This field is required.
+                        </small>
+        
+                        <!-- Pattern error (if applicable) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pattern')" class="text-red-600">
+                            Invalid format. Please check the input.
+                        </small>
+        
+                        <!-- Custom error for future date -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pastDate')" class="text-red-600">
+                            The date must be in the future.
+                        </small>
+        
+                        <!-- Other specific validation errors (if needed) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('minlength')" class="text-red-600">
+                            Minimum length requirement not met.
+                        </small>
+        
+                        <small *ngIf="formGroup.get(field.id)?.hasError('maxlength')" class="text-red-600">
+                            Maximum length exceeded.
+                        </small>
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('required')" class="text-red-600">
+                            Date of birth is required.
+                        </small>
+        
+                        <!-- Age validation error -->
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('underAge')" class="text-red-600">
+                            You must be at least 18 years old.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        
+        
+            <!-- Display validation errors -->
+        
+        
+            <hr class="my-6">
+        </div>
+        <!-- Vehicle Insurance Section -->
+        <div *ngIf="dataToShow ==='Trucks' ">
+            <h2 class="text-xl font-semibold mb-4">Vehicle Insurance </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of insuranceDetails">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+        
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+        
+                        <!-- Required error -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('required')" class="text-red-600">
+                            This field is required.
+                        </small>
+        
+                        <!-- Pattern error (if applicable) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pattern')" class="text-red-600">
+                            Invalid format. Please check the input.
+                        </small>
+        
+                        <!-- Custom error for future date -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pastDate')" class="text-red-600">
+                            The date must be in the future.
+                        </small>
+        
+                        <!-- Other specific validation errors (if needed) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('minlength')" class="text-red-600">
+                            Minimum length requirement not met.
+                        </small>
+        
+                        <small *ngIf="formGroup.get(field.id)?.hasError('maxlength')" class="text-red-600">
+                            Maximum length exceeded.
+                        </small>
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('required')" class="text-red-600">
+                            Date of birth is required.
+                        </small>
+        
+                        <!-- Age validation error -->
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('underAge')" class="text-red-600">
+                            You must be at least 18 years old.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        
+        
+            <!-- Display validation errors -->
+        
+        
+            <hr class="my-6">
+        </div>
+        <!-- Vehicle status Section -->
+        <div *ngIf="dataToShow ==='Trucks' ">
+            <h2 class="text-xl font-semibold mb-4">Vehicle Status </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of statusAndMetadata">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+        
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+        
+                        <!-- Required error -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('required')" class="text-red-600">
+                            This field is required.
+                        </small>
+        
+                        <!-- Pattern error (if applicable) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pattern')" class="text-red-600">
+                            Invalid format. Please check the input.
+                        </small>
+        
+                        <!-- Custom error for future date -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('pastDate')" class="text-red-600">
+                            The date must be in the future.
+                        </small>
+        
+                        <!-- Other specific validation errors (if needed) -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('minlength')" class="text-red-600">
+                            Minimum length requirement not met.
+                        </small>
+        
+                        <small *ngIf="formGroup.get(field.id)?.hasError('maxlength')" class="text-red-600">
+                            Maximum length exceeded.
+                        </small>
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('required')" class="text-red-600">
+                            Date of birth is required.
+                        </small>
+        
+                        <!-- Age validation error -->
+                        <small *ngIf="formGroup.get('dateOfBirth')?.hasError('underAge')" class="text-red-600">
+                            You must be at least 18 years old.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        
+        
+            <!-- Display validation errors -->
+        
+        
+            <hr class="my-6">
+        </div>
+
+
+        <!-- Company Information Section -->
+        <div *ngIf="isBoardingActive && role === 'shipperAdmin'">
+            <h2 class="text-xl font-semibold mb-4">Company Information</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of companyInformation">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+                        <small *ngIf="formGroup.get(field.id)?.errors?.['required']" class="text-red-600">
+                            This field is required
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-6">
+        </div>
+
+        <!-- Address Section -->
+        <div *ngIf="isBoardingActive &&dataToShow !=='Trucks'">
+            <h2 class="text-xl font-semibold mb-4">Address</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of address">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+                        <small *ngIf="formGroup.get(field.id)?.errors?.['required']" class="text-red-600">
+                            This field is required
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-6">
+        </div>
+
+        <!-- Bank Details Section -->
+        <div *ngIf="isBoardingActive &&dataToShow !=='Trucks'&&dataToShow !=='Company Details'">
+            <h2 class="text-xl font-semibold mb-4">Bank Details</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of bankDetails">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+
+                    <!-- Validation error messages -->
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+
+                        <!-- Show only one error message at a time -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('required')" class="text-red-600">
+                            This field is required.
+                        </small>
+
+                        <small *ngIf="formGroup.get(field.id)?.hasError('invalidIFSC')" class="text-red-600">
+                            Please enter a valid IFSC code (Format: ABCD0123456).
+                        </small>
+
+                        <small *ngIf="formGroup.get(field.id)?.hasError('invalidAccountNumber')" class="text-red-600">
+                            Please enter a valid account number (9 to 18 digits).
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-6">
+        </div>
+
+        <!-- Documents Section -->
+        <!-- <div *ngIf="isBoardingActive">
+        <h2 class="text-xl font-semibold mb-4">Documents</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <ng-container *ngIf="isDriver">
+                
+                <div class="form-group">
+                    <label for="contractFile">Upload Contract File</label>
+                    <input id="contractFile" type="file" formControlName="contractFile" (change)="readContractUrl($event)"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Upload Contract File" accept="image/*,.pdf" />
+                </div>
+                
+                
+
+            </ng-container>
+    
+            
+            <ng-container *ngIf="!isDriver">
+                <div *ngFor="let field of documents">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <div *ngIf="field.imageUrl">
+                        <img [src]="field.imageUrl" [alt]="field.label" class="w-full h-auto rounded-md shadow-sm">
+                    </div>
+                    <div *ngIf="!field.imageUrl" class="text-gray-600 text-sm">
+                        No document uploaded yet.
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <hr class="my-6">
+    </div> -->
+
+
+        <!-- Buttons Section -->
+        <div class="flex justify-center gap-4 mt-8">
+            <ng-container *ngIf="isDriver">
+                <button type="button" (click)="toggleBoarding()"
+                    class="w-1/2 py-3 px-4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    [ngClass]="{
+                            'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500': !(buttonText === 'Submit' && (formGroup.invalid || formGroup.pristine)),
+                            'bg-gray-300 text-gray-800 cursor-not-allowed focus:ring-gray-500': (formGroup.invalid || formGroup.pristine) }">
+                    {{ buttonText === 'Submit' ? 'Submit' : 'Start On-Boarding' }}
+                </button>
+            </ng-container>
+
+            <!-- Continue for Non-Drivers -->
+            <ng-container *ngIf="(role==='appAdmin'||role==='carrierAdmin') && (userStatus === 'Active'||vehicleStatus==='Active')">
+                <button *ngIf="action==='edit'" type="button" (click)="onUpdate()" [hidden]="!formGroup.dirty"
+                    class="w-1/3 bg-yellow-600 text-white py-3 rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2">
+                    Update
+                </button>
+
+                <!-- <button type="button" (click)="onDelete()"
+                    class="w-1/3 bg-red-600 text-white py-3 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    Delete
+                </button> -->
+                <button type="button" (click)="onCancel()"
+                    class="w-1/3 bg-gray-600 text-white py-3 rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    Cancel
+                </button>
+            </ng-container>
+            <ng-container *ngIf="(role==='carrierAdmin' && vehicleStatus==='Pending')|| role ==='shipperAdmin'">
+                <button *ngIf="action==='edit'||dataToShow==='Company Details' " type="button" (click)="onUpdate()" [hidden]="!formGroup.dirty"
+                    class="w-1/3 bg-yellow-600 text-white py-3 rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2">
+                    Update
+                </button> 
+                <button *ngIf="role!=='shipperAdmin'" type="button" (click)="onDelete()"
+                    class="w-1/3 bg-red-600 text-white py-3 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    Delete
+                </button>
+                <button type="button" (click)="onCancel()"
+                    class="w-1/3 bg-gray-600 text-white py-3 rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    Cancel
+                </button>
+            </ng-container>
+
+            <ng-container *ngIf="role==='appAdmin' && (userStatus === 'Pending'||vehicleStatus==='Pending')">
+                <button type="button" (click)="onApprove()"
+                    class="w-1/3 bg-yellow-600 text-white py-3 rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2">
+                    Approve Request
+                </button>
+                <button type="button" (click)="onReject()"
+                    class="w-1/3 bg-red-600 text-white py-3 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    Reject Request
+                </button>
+                <button type="button" (click)="onCancel()"
+                    class="w-1/3 bg-gray-600 text-white py-3 rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    Cancel
+                </button>
+            </ng-container>
+            <ng-container *ngIf="role==='carrierAdmin' && userStatus === 'Pending'">
+                <button type="button" (click)="onUpdate()"
+                    class="w-1/2  bg-gray-600 text-white py-3 rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                    disabled>
+                    Waiting for Approval
+                </button>
+
+                <button type="button" (click)="onCancel()"
+                    class="w-1/3 bg-gray-600 text-white py-3 rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    Cancel
+                </button>
+            </ng-container>
+        </div>
+    </form>
+</div>

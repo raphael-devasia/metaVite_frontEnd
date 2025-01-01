@@ -1,0 +1,24 @@
+/* General error styling */
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.submit-btn:disabled {
+  background-color: grey;
+  cursor: not-allowed;
+}
+
+.submit-btn {
+  background-color: blue;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.submit-btn:hover:enabled {
+  background-color: darkblue;
+}

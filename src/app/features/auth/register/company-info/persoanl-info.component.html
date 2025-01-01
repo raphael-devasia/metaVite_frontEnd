@@ -1,0 +1,40 @@
+<div class="bg-white p-6">
+  <h2 class="text-lg font-medium mb-6">Company Information</h2>
+  <form [formGroup]="formGroup">
+    <div class="grid grid-cols-2 gap-6">
+      <div class="col-span-2 sm:col-span-1">
+        <label for="company-name" class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+        <input type="text" formControlName="companyName" name="company-name" id="company-name" placeholder="Enter your company name"
+          class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500">
+        <div *ngIf="formGroup.get('companyName')?.touched && formGroup.get('companyName')?.invalid" class="text-red-500 text-sm mt-1">
+          Company Name is required.
+        </div>
+      </div>
+      <div class="col-span-2 sm:col-span-1">
+        <label for="company-email" class="block text-sm font-medium text-gray-700 mb-2">Company Email</label>
+        <input type="email" formControlName="companyEmail" name="company-email" id="company-email" placeholder="e.g., contact@company.com"
+          class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500">
+        <div *ngIf="formGroup.get('companyEmail')?.touched && formGroup.get('companyEmail')?.invalid" class="text-red-500 text-sm mt-1">
+          Valid Company Email is required.
+        </div>
+      </div>
+      <div class="col-span-2 sm:col-span-1">
+        <label for="company-phone" class="block text-sm font-medium text-gray-700 mb-2">Company Phone Number</label>
+        <input type="tel" formControlName="companyPhone" name="company-phone" id="company-phone" placeholder="e.g., +1-555-555-5555"
+          class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500">
+        <div *ngIf="formGroup.get('companyPhone')?.touched && formGroup.get('companyPhone')?.invalid" class="text-red-500 text-sm mt-1">
+          Valid Company Phone Number is required.
+        </div>
+      </div>
+      <div class="col-span-2 sm:col-span-1">
+        <label for="tax-number" class="block text-sm font-medium text-gray-700 mb-2">Tax Number</label>
+        <input type="text" formControlName="taxId" name="tax-number" id="tax-number" placeholder="Enter your tax identification number"
+          class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500">
+        <div *ngIf="formGroup.get('taxId')?.touched && formGroup.get('taxId')?.invalid" class="text-red-500 text-sm mt-1">
+          Tax Number is required.
+        </div>
+      </div>
+    </div>
+    
+  </form>
+</div>

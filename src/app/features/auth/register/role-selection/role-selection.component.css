@@ -1,0 +1,36 @@
+.app-button {
+  width: 10rem;
+  /* Adjust size as needed */
+  height: 10rem;
+  /* Adjust size as needed */
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.app-button:hover {
+  box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
+  border-color: blue;
+}
+
+.app-button.active {
+  border-color: blue;
+}
+
+.app-button .font-sans {
+  margin-top: -0.25rem;
+}
+.buttons {
+  position: relative;
+  bottom: -4rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+}

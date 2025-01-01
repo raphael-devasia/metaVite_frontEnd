@@ -1,0 +1,40 @@
+<div class="p-6">
+    <h4 class="font-semibold text-gray-800">{{ bidTableData.title }}</h4>
+    <div class="overflow-x-auto">
+        <table class="table-auto w-full text-left">
+            <thead class="text-yellow-600">
+                <tr>
+                    <th *ngFor="let head of bidTableData.tableHeads" class="py-2 px-4 border-b">
+                        {{ head }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of bidTableData.tableData">
+                    <ng-container *ngFor="let key of getObjectKeys(row)">
+                        <td *ngIf="key !== '_id'" class="py-2 px-4 text-center">
+                            <!-- Conditional logic for status -->
+                            <div *ngIf="key === 'status'; else normalCell">
+                                <div class="flex items-center justify-center">
+                                    <div [ngClass]="{
+                      'bg-green-500': row[key] === 'Open',
+                      'bg-red-500': row[key] === 'Closed'
+                    }" class="h-2.5 w-2.5 rounded-full me-2">
+                                    </div>
+                                    {{ row[key] }}
+                                </div>
+                            </div>
+                            <!-- Default cell content -->
+                            <ng-template #normalCell>
+                                {{ row[key] }}
+                            </ng-template>
+                        </td>
+                    </ng-container>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <button class="text-blue-500 hover:underline mt-4">
+        {{ bidTableData.button }}
+    </button>
+</div>

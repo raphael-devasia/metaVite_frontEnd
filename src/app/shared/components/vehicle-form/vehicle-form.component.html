@@ -1,0 +1,35 @@
+<div class="form-container w-full">
+    <h1>{{ formTitle }}</h1>
+    <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="w-full">
+        <div class="form-grid">
+            <!-- Vehicle Information Fields -->
+            <div *ngFor="let field of vehicleInformation" class="form-field">
+                <label [for]="field.id">{{ field.label }}</label>
+                <input *ngIf="field.type !== 'date'" [id]="field.id" [type]="field.type"
+                    [placeholder]="field.placeholder" [formControlName]="field.id" [disabled]="field.disabled" />
+                <input *ngIf="field.type === 'date'" [id]="field.id" [type]="field.type"
+                    [placeholder]="field.placeholder" [formControlName]="field.id" />
+                <div *ngIf="vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched"
+                    class="error-message">
+                    <p>Invalid {{ field.label }}</p>
+                </div>
+            </div>
+
+            <!-- Insurance Information Fields -->
+            <div *ngFor="let field of insuranceInformation" class="form-field">
+                <label [for]="field.id">{{ field.label }}</label>
+                <input *ngIf="field.type !== 'date'" [id]="field.id" [type]="field.type"
+                    [placeholder]="field.placeholder" [formControlName]="field.id" />
+                <input *ngIf="field.type === 'date'" [id]="field.id" [type]="field.type"
+                    [placeholder]="field.placeholder" [formControlName]="field.id" />
+                <div *ngIf="vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched"
+                    class="error-message">
+                    <p>Invalid {{ field.label }}</p>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" [disabled]="vehicleForm.invalid">Submit</button>
+        
+    </form>
+</div>

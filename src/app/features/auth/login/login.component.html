@@ -1,0 +1,68 @@
+<div class="container">
+    <div class="card">
+        <div class="form">
+            <div class="left-side">
+                <div class="left-heading"></div>
+                <div class="steps-content">
+                    <img src="logo.png" alt="metaVite logo">
+                </div>
+                <ul class="progress-bar"></ul>
+            </div>
+
+            <div class="flex items-center justify-center w-full p-4 m-4 dark:bg-gray-950">
+                <div class="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 max-w-md p-4 m-4">
+                    <h1 class="text-2xl font-bold text-center mb-4 dark:text-gray-200">Welcome Back!</h1>
+                    <form [formGroup]="formGroup" class="w-full p-4 m-4 dark:bg-gray-950" (ngSubmit)="onSubmit()">
+                        <div class="mb-4">
+                            <label for="username"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Username</label>
+                            <input type="text" id="username" formControlName="username"
+                                class="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter Your Username" required>
+                            <div *ngIf="formGroup.get('username')?.touched && formGroup.get('username')?.invalid"
+                                class="text-red-500 text-sm mt-1">
+                                Username must be 9 characters.
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                            <input type="password" id="password" formControlName="password"
+                                class="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter your password" required>
+                            <div *ngIf="formGroup.get('password')?.touched && formGroup.get('password')?.invalid"
+                                class="text-red-500 text-sm mt-1">
+                                Password must be at least 8 characters.
+                            </div>
+                            <a href="#"
+                                class="text-xs text-gray-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Forgot
+                                Password?</a>
+                        </div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="remember"
+                                    class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 focus:outline-none"
+                                    checked>
+                                <label for="remember"
+                                    class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Remember
+                                    me</label>
+                            </div>
+                            <a (click)="navigateToRegister()"
+                                class="text-xs text-indigo-500 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Create
+                                Account</a>
+                        </div>
+                        <div class="flex justify-center btnstyle">
+                            <button type="submit"
+                                class="w-1/2 bg-green-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg focus:outline-none">
+                                Login
+                            </button>
+                        </div>
+                        <div *ngIf="errorMessage" class="text-red-500 text-sm mt-4 text-center">
+                            {{ errorMessage }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

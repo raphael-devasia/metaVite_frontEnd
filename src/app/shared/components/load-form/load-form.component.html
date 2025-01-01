@@ -1,0 +1,238 @@
+<div class="max-w-4xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md form-container">
+    <h2>Create Load</h2>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-full">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Basic Information</h3>
+      
+
+        <!-- Material & Quantity -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label>Material</label>
+                <input type="text" formControlName="material" placeholder="Enter material" />
+                <div *ngIf="form.get('material')?.touched && form.get('material')?.hasError('required')"
+                    class="text-red-600">
+                    Material is required.
+                </div>
+            </div>
+            <div>
+                <label>Quantity</label>
+                <input type="number" formControlName="quantity" placeholder="Enter quantity" />
+                <div *ngIf="form.get('quantity')?.touched && form.get('quantity')?.hasError('required')"
+                    class="text-red-600">
+                    Quantity is required.
+                </div>
+                <div *ngIf="form.get('quantity')?.touched && form.get('quantity')?.hasError('quantityInTons')"
+                    class="text-red-600">
+                    Quantity must be in tons.
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label>Vehicle Body</label>
+                <select formControlName="vehicleBody">
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+            <div>
+                <label>Vehicle Type</label>
+                <select formControlName="vehicleType">
+                    <option *ngFor="let vehicle of vehicleTypes" [value]="vehicle.value">{{ vehicle.type }}</option>
+                </select>
+            </div>
+
+            <!-- M&HCV Subtypes -->
+            <div *ngIf="form.get('vehicleType')?.value === 'mhcv'">
+                <div>
+                    <label>M&HCV Subtype</label>
+                    <select formControlName="mhcvSubtype">
+                        <option *ngFor="let subtype of mhcvSubTypes" [value]="subtype.value">{{ subtype.type }}</option>
+                    </select>
+                </div>
+                <div>
+                    <div *ngIf="form.get('mhcvSubtype')?.value === 'trailer'">
+                        <label>Trailer Feet</label>
+                        <input type="number" formControlName="trailerFeet" placeholder="Enter trailer feet" />
+                        <div *ngIf="form.get('trailerFeet')?.touched && form.get('trailerFeet')?.hasError('trailerFeet')"
+                            class="text-red-600">
+                            Trailer length must be between 12 and 60 feet.
+                        </div>
+                    </div>
+                    <div *ngIf="form.get('mhcvSubtype')?.value === 'tipper'">
+                        <label>Tipper Load</label>
+                        <input type="text" formControlName="tipperLoad" placeholder="Enter tipper load" />
+                        <div *ngIf="form.get('tipperLoad')?.touched && form.get('tipperLoad')?.hasError('tipperLoad')"
+                            class="text-red-600">
+                            Tipper load must be between 1 and 25 tons.
+                        </div>
+                    </div>
+                    <div *ngIf="form.get('mhcvSubtype')?.value === 'transit-mixer'">
+                        <label>Transit Mixer Capacity</label>
+                        <input type="text" formControlName="mixerCapacity" placeholder="Enter capacity" />
+                        <div *ngIf="form.get('mixerCapacity')?.touched && form.get('mixerCapacity')?.hasError('mixerCapacity')"
+                            class="text-red-600">
+                            Mixer capacity must be between 1 and 15 cubic meters.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label>Agent Name</label>
+                <input type="text" formControlName="agentName" placeholder="Enter name" />
+                <div *ngIf="form.get('agentName')?.touched && form.get('agentName')?.hasError('required')"
+                    class="text-red-600">
+                    Agent name is required.
+                </div>
+                <div *ngIf="form.get('agentName')?.touched && form.get('agentName')?.hasError('pattern')"
+                    class="text-red-600">
+                    Agent name must contain only alphabets.
+                </div>
+            </div>
+            <div>
+                <label>Agent Contact</label>
+                <input type="text" formControlName="agentContact" placeholder="Enter contact" />
+                <div *ngIf="form.get('agentContact')?.touched && form.get('agentContact')?.hasError('required')"
+                    class="text-red-600">
+                    Agent contact is required.
+                </div>
+                <div *ngIf="form.get('agentContact')?.touched && form.get('agentContact')?.hasError('pattern')"
+                    class="text-red-600">
+                    Agent contact must be a valid Indian phone number.
+                </div>
+            </div>
+        </div>
+
+            <!-- Dispatch & Delivery Details -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label>Dispatch Date and Time</label>
+                    <input type="datetime-local" formControlName="dispatchDateTime" />
+                    <div *ngIf="form.get('dispatchDateTime')?.touched && form.get('dispatchDateTime')?.hasError('required')"
+                        class="text-red-600">
+                        Dispatch date and time are required.
+                    </div>
+                    <div *ngIf="form.get('dispatchDateTime')?.touched && form.get('dispatchDateTime')?.hasError('futureDate')"
+                        class="text-red-600">
+                        Dispatch date and time must be in the future.
+                    </div>
+                </div>
+                <div>
+                    <label>Expected Delivery</label>
+                    <input type="datetime-local" formControlName="expectedDelivery"
+                        [disabled]="!form.get('dispatchDateTime')?.valid" />
+                    <div *ngIf="form.get('expectedDelivery')?.touched && form.get('expectedDelivery')?.hasError('required')"
+                        class="text-red-600">
+                        Expected delivery is required.
+                    </div>
+                    <div *ngIf="form.get('expectedDelivery')?.touched && form.get('expectedDelivery')?.hasError('dateAfter')"
+                        class="text-red-600">
+                        Expected delivery must be after the dispatch date and time.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pricing -->
+            <div>
+                <label>Base Price</label>
+                <input type="number" formControlName="basePrice" placeholder="Enter base price" />
+                <div *ngIf="form.get('basePrice')?.touched && form.get('basePrice')?.dirty && form.get('basePrice')?.hasError('required')"
+                    class="text-red-600">
+                    Base price is required.
+                </div>
+                <div *ngIf="form.get('basePrice')?.touched && form.get('basePrice')?.dirty && form.get('basePrice')?.hasError('min')"
+                    class="text-red-600">
+                    Base price must be at least 3000.
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="dropoffs">Number of Dropoffs</label>
+                    <select id="dropoffs" formControlName="dropoffs">
+                        <option *ngFor="let drop of dropOffs" [value]="drop">{{ drop }}</option>
+                    </select>
+                    <button type="button" (click)="openClientModal()">Add A Client</button>
+                </div>
+            </div>
+            
+            <!-- Clients and Appointments -->
+            <div *ngFor="let dropoff of [1, 2, 3]; let i = index">
+                <div *ngIf="i < form.get('dropoffs')?.value">
+                    <div>
+                        <label for="client{{ dropoff }}" class="block text-sm font-medium text-gray-700">Client {{ dropoff
+                            }}</label>
+                        <select id="client{{ dropoff }}" [formControlName]="'client' + dropoff">
+                            <option [ngValue]="form.get('client' + dropoff)?.value?.display || ''" disabled>
+                                {{ form.get('client' + dropoff)?.value?.display || 'Select a Client' }}
+                            </option>
+                            <option *ngFor="let client of availableClients" [ngValue]="client">{{ client.display }}</option>
+                        </select>
+                        <div *ngIf="form.get('client' + dropoff)?.touched && form.get('client' + dropoff)?.hasError('required')"
+                            class="text-red-600">
+                            Client is required.
+                        </div>
+                        <div *ngIf="form.errors?.uniqueClientAddresses" class="text-red-600"> Client addresses must be unique.
+                        </div>
+                    </div>
+            
+                    <div>
+                        <label for="appointment{{ dropoff }}" class="block text-sm font-medium text-gray-700">Appointment
+                            Time {{ dropoff }}</label>
+                        <input id="appointment{{ dropoff }}" type="datetime-local" [formControlName]="'appointment' + dropoff"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            [disabled]="!form.get('dispatchDateTime')?.valid" />
+                        <div *ngIf="form.get('appointment' + dropoff)?.touched && form.get('appointment' + dropoff)?.hasError('required')"
+                            class="text-red-600">
+                            Appointment time is required.
+                        </div>
+                        <div *ngIf="form.get('appointment' + dropoff)?.touched && form.get('appointment' + dropoff)?.hasError('appointmentsAfterDelivery')"
+                            class="text-red-600">
+                            Appointment must be after the expected delivery time.
+                        </div>
+                    </div>
+                </div>
+            </div>
+           <!-- Drop-off and Appointment Errors -->
+            <div *ngIf="form.errors?.mandatoryDropoffOrder && form.touched" class="text-red-600">
+                Drop-offs must follow the order.
+            </div>
+            <div *ngIf="form.errors?.appointmentsAfterDelivery && form.touched" class="text-red-600">
+                Appointments must follow the expected delivery.
+            </div>
+            
+            <!-- Pickup Location -->
+            <div>
+                <label>Pickup Location</label>
+                <select [formControlName]="'pickupLocation'">
+                    <option value="" disabled>Select Pickup Address</option>
+                    <option *ngFor="let client of companyAddresses" [ngValue]="client">{{ client.display }}</option>
+                </select>
+                <button type="button" (click)="openPickupModal()">Add New Location</button>
+            </div>
+            <div *ngIf="message"
+                [ngClass]="{ 'text-green-500': messageType === 'success', 'text-red-500': messageType === 'error' }"
+                class="mt-4 text-center">
+                {{ message }}
+            </div>
+            
+            <!-- Submit and Cancel -->
+            <div class="flex justify-end">
+                <button type="button" (click)="onCancel()" class="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Cancel</button>
+                <button type="submit" [disabled]="form.invalid" class="bg-blue-500 text-white px-4 py-2 rounded-md">Submit</button>
+            </div>
+            </form>
+            
+            <!-- Client Modal -->
+            <app-adress-modal *ngIf="showClientModal" (closeModal)="closeClientModal()" (onSave)="saveClient($event)"
+                (onClose)="closeClientModal()" [modalHeading]='modalHeading'></app-adress-modal>
+            
+            <!-- Pickup Modal -->
+            <app-adress-modal *ngIf="showPickupModal" (closeModal)="closePickupModal()" (onSave)="savePickup($event)"
+                (onClose)="closePickupModal()" [modalHeading]='modalHeading'></app-adress-modal>
+            </div>

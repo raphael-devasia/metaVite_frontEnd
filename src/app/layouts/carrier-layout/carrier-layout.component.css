@@ -1,0 +1,28 @@
+/* parent.component.css */
+.chat-container {
+  position: fixed; /* Fixes the position relative to the viewport */
+  bottom: 20px;    /* Distance from the bottom */
+  right: 20px;      /* Distance from the left */
+  width: 700px;    /* Set the desired width */
+  height: 800px;   /* Set the desired height */
+  border: 1px solid #ddd; /* Optional border */
+  border-radius: 8px;     /* Optional rounded corners */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional shadow */
+ 
+  z-index: 1000;   /* Ensures it stays on top of all other elements */
+  overflow: hidden;
+
+}
+.chat-icon {
+    position: fixed;
+    bottom: 20px; /* Adjust the distance from the bottom */
+    right: 20px;  /* Adjust the distance from the right */
+    z-index: 1000; /* Ensure it is on top of everything */
+}
+
+.chat-icon img {
+    width: 50px; /* Adjust size as needed */
+    height: 50px; /* Maintain aspect ratio or adjust size as needed */
+    cursor: pointer; /* Optional: change cursor to pointer */
+}
+

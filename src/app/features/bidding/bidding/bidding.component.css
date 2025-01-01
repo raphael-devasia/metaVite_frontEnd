@@ -1,0 +1,14 @@
+.custom-dialog-container {
+  max-height: 90vh; /* Ensure dialog fits within the viewport */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.mat-dialog-content {
+  max-height: calc(80vh - 64px); /* Adjust height for content */
+  overflow-y: auto; /* Allow scrolling */
+}
+.error-text {
+  color: red;
+  font-size: 0.875rem; /* Optional: Adjust the font size */
+  font-weight: bold;   /* Optional: Make the text bold */
+}

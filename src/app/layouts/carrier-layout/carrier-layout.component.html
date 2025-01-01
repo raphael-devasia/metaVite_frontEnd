@@ -1,0 +1,67 @@
+
+
+
+<div class="flex h-screen">
+    <div *ngIf="isChatActive" class="chat-container">
+        <app-chat [chatUser]="chatUser"></app-chat>
+    </div>
+    <!-- Sidebar -->
+    <div class="w-1/6 h-full" >
+        <app-sidebar [buttonTexts]="buttonTexts" (buttonClick)="onSidebarButtonClick($event)"></app-sidebar>
+    </div>
+    <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Dashboard'">
+        <app-carrier-dashboard
+            [fullData]="dashBoardData"></app-carrier-dashboard>
+    </div>
+
+
+    <!-- Table -->
+    <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Search & Bid'">
+        <app-table [tabledata]="bidTableData"></app-table>
+    </div>
+    <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Active Bids'">
+        <app-table [tabledata]="activeBidTableData"></app-table>
+    </div>
+
+    <div class="w-5/6 h-full" *ngIf="!showForm && !showModal  && selectedComponent === 'Drivers'">
+        <app-table [tabledata]="driverTableData" (driverInvitation)="driverInvitation($event)"></app-table>
+    </div>
+<div class="w-5/6 h-full" *ngIf="!showForm && !showModal&&!showVehicleForm  && selectedComponent === 'Trucks'">
+    <app-table [tabledata]="truckTableData" ></app-table>
+</div>
+<div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Shipments'">
+    <app-table [tabledata]="shipmentTableData"></app-table>
+</div>
+<div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Payments'">
+    <app-table [tabledata]="paymentTableData"></app-table>
+</div>
+
+    <!-- Form -->
+    <div class="w-5/6 h-full" *ngIf="showForm">
+        <app-form [formGroup]="personalInfoForm" [personalInformation]="personalInformation" [bankDetails]="bankDetails"
+            [additionalInformation]="additionalInformation" [address]="address" [isDriver]="isDriver"
+            [userStatus]="userStatus" [role]="role" [formTitle]='formTitle'[action]="action"> </app-form>
+    </div>
+<div class="w-5/6 h-full" *ngIf="showVehicleForm">
+    <app-form [formGroup]="vehicleForm" [role]="role" [vehicleDetails]="vehicleDetails"
+        [vehicleSpecifications]="vehicleSpecifications" [registrationAndLicensing]="registrationAndLicensing"
+        [insuranceDetails]="insuranceDetails" [statusAndMetadata]="statusAndMetadata" [dataToShow]="dataToShow"
+        [isDriver]="isDriver" [vehicleStatus]="vehicleStatus" [formTitle]='formTitle'[action]="action"  >
+    </app-form>
+</div>
+<div class="chat-icon">
+    <button (click)="chatBoxToggle()">
+        <img src="assets/images/chat.png" alt="Chat Image">
+    </button>
+    
+</div>
+
+
+    <!-- Modal -->
+    <!-- <div *ngIf="showModal" class="w-5/6 h-full">
+        <app-modal [action]="currentAction"></app-modal>
+    </div> -->
+</div>
+<!-- delete Modal -->
+<app-delete-modal *ngIf="showDeleteModal" (closeModal)="closeDeleteModal()" [action]="target" [userId]="targetId"
+    [deleteItem]="deleteResource.bind(this)"></app-delete-modal>
