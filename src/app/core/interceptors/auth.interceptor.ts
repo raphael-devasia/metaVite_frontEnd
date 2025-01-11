@@ -3,7 +3,8 @@ import { HttpInterceptorFn } from '@angular/common/http';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   console.log('Auth Interceptor triggered');
 
-  let baseUrl = 'http://a4624d01d367b4e51ae51cbe6f066c92-452922102.eu-north-1.elb.amazonaws.com:4000/'
+  let baseUrl =
+    'https://a4624d01d367b4e51ae51cbe6f066c92-452922102.eu-north-1.elb.amazonaws.com:4000/';
 
   // Check if the request URL matches the specific endpoint
   // if (req.url.startsWith('http://localhost:4000/auth/register')) {

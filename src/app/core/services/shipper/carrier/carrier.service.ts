@@ -8,7 +8,8 @@ import { Invitation } from '../../../../shared/models/user';
 })
 export class CarrierService {
   // private baseUrl = 'http://localhost:4000/';
-  private baseUrl = 'http://a4624d01d367b4e51ae51cbe6f066c92-452922102.eu-north-1.elb.amazonaws.com:4000/';
+  private baseUrl =
+    'https://a4624d01d367b4e51ae51cbe6f066c92-452922102.eu-north-1.elb.amazonaws.com:4000/';
 
   http = inject(HttpClient);
   constructor() {}
