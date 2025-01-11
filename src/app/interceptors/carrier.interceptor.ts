@@ -11,7 +11,7 @@ export const carrierInterceptor: HttpInterceptorFn = (req, next) => {
   // Initialize token as null
   let token: string | null = null;
   let baseUrl =
-    'https://a4624d01d367b4e51ae51cbe6f066c92-452922102.eu-north-1.elb.amazonaws.com/';
+    'https://ac385a1c747ba4795a44cab8e15e55d4-563323433.eu-north-1.elb.amazonaws.com/';
 
   // // Check if the request URL starts with specific paths
   // if (req.url.startsWith('http://localhost:4000/shipper')) {
