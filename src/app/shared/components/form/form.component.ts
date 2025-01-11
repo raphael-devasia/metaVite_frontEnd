@@ -7,6 +7,7 @@ import {
   Input,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -33,6 +34,7 @@ interface FormField {
   placeholder: string;
   disabled?: boolean; // Added disabled property
   imageUrl?: string;
+  options?:string[]
 }
 
 @Component({
@@ -77,7 +79,7 @@ export class FormComponent implements OnInit {
     private fb: FormBuilder,
     @Inject(DataService) private dataService: DataService,
     private router: Router,
-    private toastr: ToastrService,
+    private toastr: ToastrService
   ) {}
   get vehicleId(): string | '' {
     return this.formGroup.get('_id')?.value; // Accessing the `id` field
@@ -86,8 +88,8 @@ export class FormComponent implements OnInit {
     return this.formGroup.get('companyRefId')?.value; // Accessing the `id` field
   }
   ngOnInit(): void {
-    console.log('the data to show is ',this.dataToShow);
-    
+    console.log('the data to show is ', this.dataToShow);
+
     if (this.dataToShow === 'Trucks') {
       this.addControls(this.vehicleDetails);
       this.addControls(this.vehicleSpecifications);
@@ -114,6 +116,8 @@ export class FormComponent implements OnInit {
     }
     this.checkIfDriver();
     console.log(this.userId);
+    console.log(this.userStatus);
+    console.log(this.role);
   }
 
   addControls(fields: FormField[]): void {
@@ -174,6 +178,36 @@ export class FormComponent implements OnInit {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    // Check if userStatus has changed
+    if (changes.userStatus) {
+      console.log('user status changed');
+
+      this.updateFormStatus();
+    }
+  }
+
+  // Centralized function to handle form updates
+  updateFormStatus() {
+    if (this.userStatus === 'Pending' && this.role === 'carrierAdmin') {
+      Object.keys(this.formGroup.controls).forEach((field) => {
+        const control = this.formGroup.get(field);
+        if (control) {
+          control.disable(); // Disable the form control to make it read-only
+        }
+        if (!control?.value) {
+          control?.setValue('Value not available');
+        }
+      });
+    } else {
+      Object.keys(this.formGroup.controls).forEach((field) => {
+        const control = this.formGroup.get(field);
+        if (control) {
+          control.enable(); // Re-enable the form controls if conditions are not met
+        }
+      });
+    }
+  }
   // onUpdate(): void {
   //   if (this.formTitle === 'Driver Details') {
   //     this.formGroup.patchValue({ status: 'Active' }); // Update the status
@@ -204,123 +238,194 @@ export class FormComponent implements OnInit {
   //   }
   // }
 
-
-onUpdate(): void {
-  const formValue = this.formGroup.value;
-
-  if (!formValue._id && this.dataToShow!=='Company Details') {
-    this.toastr.error('Update operation cannot proceed without an ID.', 'Error');
-    console.error('ID is missing in form value. Update operation cannot proceed.');
-    return;
-  }
-
-
-  // Function to handle success and error responses
-  const handleResponse = (data: any, entity: string) => {
-    if (data.success) {
-      console.log(`${entity} updated successfully`, data);
-      console.log(entity);
-      
-      this.dataService.sendData(entity);
-      this.toastr.success(`${entity} updated successfully`, 'Success');
-    } else {
-      console.error(`${entity} update failed:`, data.text);
-      this.toastr.error(data.text || 'An error occurred while updating.', 'Error');
+  onUpdate(): void {
+    const formValue = this.formGroup.value;
+    console.log(formValue);
+    
+    if (!formValue._id && this.dataToShow !== 'Company Details') {
+      this.toastr.error(
+        'Update operation cannot proceed without an ID.',
+        'Error'
+      );
+      console.error(
+        'ID is missing in form value. Update operation cannot proceed.'
+      );
+      return;
     }
-  };
 
-  // Common function to handle errors in subscriptions
-  const handleError = (error: any) => {
-    console.error('An error occurred during the update operation:', error);
-    this.toastr.error('An unexpected error occurred. Please try again later.', 'Error');
-  };
+    // Function to handle success and error responses
+    const handleResponse = (data: any, entity: string) => {
+      if (data.success) {
+        console.log(`${entity} updated successfully`, data);
+        console.log(entity);
 
-  // Update Driver Details
-  if (this.formTitle === 'Driver Details') {
-    this.formGroup.patchValue({ status: 'Active' }); // Update the status
-    console.log('Updating Driver:', formValue._id);
+        this.dataService.sendData(entity);
+        this.toastr.success(`${entity} updated successfully`, 'Success');
+      } else {
+        console.error(`${entity} update failed:`, data.text);
+        this.toastr.error(
+          data.text || 'An error occurred while updating.',
+          'Error'
+        );
+      }
+    };
 
-    this.driverData.updateDriverInfo(formValue, formValue._id).subscribe({
-      next: (data) => handleResponse(data, 'Drivers'),
-      error: handleError,
-    });
+    // Common function to handle errors in subscriptions
+    const handleError = (error: any) => {
+      console.error('An error occurred during the update operation:', error);
+      this.toastr.error(
+        'An unexpected error occurred. Please try again later.',
+        'Error'
+      );
+    };
 
-  // Update Truck Details
-  } else if (this.formTitle === 'Truck Details') {
-    console.log('Updating Truck:', formValue._id);
+    // Update Driver Details
+    if (this.formTitle === 'Driver Details') {
+      this.formGroup.patchValue({ status: 'Active' }); // Update the status
+      console.log('Updating Driver:', formValue._id);
 
-    this.driverData.updateTruckInfo(formValue, formValue._id).subscribe({
-      next: (data) => handleResponse(data, 'Trucks'),
-      error: handleError,
-    });
+      this.driverData.updateDriverInfo(formValue, formValue._id).subscribe({
+        next: (data) => handleResponse(data, 'Drivers'),
+        error: handleError,
+      });
 
-    // Default Case (Fallback)
-  } else if (this.dataToShow === 'Company Details') {
-    console.log('Updating company:',this.userId);
+      // Update Truck Details
+    } else if (this.formTitle === 'Truck Details') {
+      console.log('Updating Truck:', formValue._id);
 
-    this.driverData.updateTruckInfo(formValue, formValue._id).subscribe({
-      next: (data) => handleResponse(data, 'Trucks'),
-      error: handleError,
-    });
+      this.driverData.updateTruckInfo(formValue, formValue._id).subscribe({
+        next: (data) => handleResponse(data, 'Trucks'),
+        error: handleError,
+      });
 
-    // Default Case (Fallback)
-  } else {
-    console.log('Updating Default Entity (Driver):', formValue._id);
+      // Default Case (Fallback)
+    } else if (this.formTitle === 'My Details') {
+      console.log('Updating Driver details:', formValue._id);
 
-    this.driverData.updateDriverInfo(formValue, formValue._id).subscribe({
-      next: (data) => handleResponse(data, 'Driver'),
-      error: handleError,
-    });
+      this.driverData.updateDriverInfo(formValue, formValue._id).subscribe({
+        next: (data) => handleResponse(data, 'Driver'),
+        error: handleError,
+      });
+
+      // Default Case (Fallback)
+    } else if (this.dataToShow === 'Company Details') {
+      console.log('Updating company:', this.userId);
+
+      this.driverData.updateTruckInfo(formValue, formValue._id).subscribe({
+        next: (data) => handleResponse(data, 'Trucks'),
+        error: handleError,
+      });
+
+      // Default Case (Fallback)
+    } else if (this.dataToShow === 'Carrier Company Details') {
+      console.log('Updating company:', formValue);
+
+      this.carrierService
+        .updateCompanyInfo(this.userId, formValue)
+        .subscribe({
+          next: (data) => handleResponse(data, 'Dashboard'),
+          error: handleError,
+        });
+
+      // Default Case (Fallback)
+    } else {
+      console.log('Updating Default Entity (Driver):', formValue._id);
+
+      this.driverData.updateDriverInfo(formValue, formValue._id).subscribe({
+        next: (data) => handleResponse(data, 'Driver'),
+        error: handleError,
+      });
+    }
   }
-}
-
 
   onDelete(): void {
     console.log('Delete action');
   }
 
   onCancel(): void {
-    if (this.formTitle === 'Truck Details'){
+    if (this.formTitle === 'Truck Details') {
       this.dataService.sendData('Trucks');
     }
-     if (this.formTitle === 'Driver Details') {
-       this.dataService.sendData('Drivers');
-     }
-     if(this.dataToShow==='Company Details'){
-       this.dataService.sendData('Dashboard');
-     }
+    if (this.formTitle === 'Driver Details') {
+      this.dataService.sendData('Drivers');
+    }
+    if (this.dataToShow === 'Company Details') {
+      this.dataService.sendData('Dashboard');
+    }if (this.formTitle === 'My Details') {
+      this.dataService.sendData('My Details');
+    }
   }
-  onApprove() {
-    const formData = this.formGroup.value; // Get the form values
-    console.log('the form dtat is', formData);
-    console.log(this.companyRefId);
+  // onApprove() {
+  //   const formData = this.formGroup.value;
+  //    formData.isActive = true;
+  //   console.log('the form dtat is', formData);
+  //   console.log(this.companyRefId);
 
-    // Determine which service to use based on the route
+  //   // Determine which service to use based on the route
+  //   const isCarrierAdmin = this.router.url.includes('/carrier/admin');
+
+  //   if (formData.LicensePlateNumber) {
+  //     this.formGroup.patchValue({ Status: 'Active' });
+  //     this.formGroup.patchValue({ isActive:true });
+  //     this.formGroup.patchValue({ companyRefId: this.companyRefId }); // Update the status
+
+  //     const service = isCarrierAdmin ? this.driverData : this.userData; // Choose service dynamically
+
+  //     service
+  //       .updateTruckInfo(this.formGroup.value, this.vehicleId)
+  //       .subscribe((data) => {
+  //         console.log('Vehicle updated successfully');
+  //       });
+  //   } else {
+  //     this.formGroup.patchValue({ status: 'Active' }); // Update the status
+  //     this.formGroup.patchValue({ isActive: true });
+  //     console.log(this.formGroup.value.id); // Check updated values
+
+  //     const service = isCarrierAdmin ? this.driverData : this.userData; // Choose service dynamically
+
+  //     service
+  //       .updateDriverInfo(this.formGroup.value, this.formGroup.value.id)
+  //       .subscribe((data) => {
+  //         console.log('Driver updated successfully');
+  //       });
+  //   }
+  // }
+  onApprove() {
     const isCarrierAdmin = this.router.url.includes('/carrier/admin');
 
-    if (formData.LicensePlateNumber) {
+    // Check if LicensePlateNumber exists to determine whether it's a truck or driver
+    if (this.formGroup.get('LicensePlateNumber')?.value) {
       this.formGroup.patchValue({ Status: 'Active' });
-      this.formGroup.patchValue({ companyRefId: this.companyRefId }); // Update the status
+      this.formGroup.patchValue({ isActive: true });
+      this.formGroup.patchValue({ companyRefId: this.companyRefId });
+
+      const formData = this.formGroup.value; // Get the form values after patching
+      console.log('the form data is', formData);
+      console.log(this.companyRefId);
 
       const service = isCarrierAdmin ? this.driverData : this.userData; // Choose service dynamically
 
-      service
-        .updateTruckInfo(this.formGroup.value, this.vehicleId)
-        .subscribe((data) => {
-          console.log('Vehicle updated successfully');
-        });
+      service.updateTruckInfo(formData, this.vehicleId).subscribe((data) => {
+        console.log('Vehicle updated successfully');
+      });
     } else {
-      this.formGroup.patchValue({ status: 'Active' }); // Update the status
+      this.formGroup.patchValue({ status: 'Active' });
+      this.formGroup.patchValue({ isActive: true });
+      this.formGroup.patchValue({ companyRefId: this.companyRefId });
+
+      const formData = this.formGroup.value; // Get the form values after patching
+      console.log('the form data is', formData);
       console.log(this.formGroup.value.id); // Check updated values
 
       const service = isCarrierAdmin ? this.driverData : this.userData; // Choose service dynamically
 
       service
-        .updateDriverInfo(this.formGroup.value, this.formGroup.value.id)
+        .updateDriverInfo(formData, this.formGroup.value.id)
         .subscribe((data) => {
           console.log('Driver updated successfully');
         });
     }
   }
+
   onReject() {}
 }

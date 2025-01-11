@@ -1,4 +1,4 @@
-<div class="bg-white p-6">
+<!-- <div class="bg-white p-6">
     <h2 class="text-lg font-medium mb-6">Personal Details</h2>
     <form [formGroup]="formGroup">
         <div class="grid grid-cols-2 gap-6">
@@ -38,6 +38,83 @@
                 <div *ngIf="formGroup.get('emergencyContactNumber')?.touched && formGroup.get('emergencyContactNumber')?.invalid"
                     class="text-red-500 text-sm mt-1">
                     Valid Indian Phone Number is required.
+                </div>
+            </div>
+        </div>
+    </form>
+</div> -->
+
+<div class="bg-white p-6">
+    <h2 class="text-lg font-medium mb-6">Personal Details</h2>
+    <form [formGroup]="formGroup">
+        <div class="grid grid-cols-2 gap-6">
+            <div class="col-span-2 sm:col-span-1">
+                <label for="first-name" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                <input formControlName="firstName" type="text" name="first-name" id="first-name"
+                    placeholder="Enter your first name"
+                    class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500"
+                    [ngClass]="{'border-red-500': formGroup.get('firstName')?.touched && formGroup.get('firstName')?.invalid}">
+                <div *ngIf="formGroup.get('firstName')?.touched && formGroup.get('firstName')?.invalid"
+                    class="text-red-500 text-sm mt-1">
+                    <span *ngIf="formGroup.get('firstName')?.errors?.['required']">First name is required.</span>
+                    <span *ngIf="formGroup.get('firstName')?.errors?.['minlength']">First name must be at least 3
+                        characters.</span>
+                    <span *ngIf="formGroup.get('firstName')?.errors?.['maxlength']">First name cannot exceed 50
+                        characters.</span>
+                    <span *ngIf="formGroup.get('firstName')?.errors?.['pattern']">Please enter valid letters
+                        only.</span>
+                </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1">
+                <label for="last-name" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                <input formControlName="lastName" type="text" name="last-name" id="last-name"
+                    placeholder="Enter your last name"
+                    class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500"
+                    [ngClass]="{'border-red-500': formGroup.get('lastName')?.touched && formGroup.get('lastName')?.invalid}">
+                <div *ngIf="formGroup.get('lastName')?.touched && formGroup.get('lastName')?.invalid"
+                    class="text-red-500 text-sm mt-1">
+                    <span *ngIf="formGroup.get('lastName')?.errors?.['required']">Last name is required.</span>
+                    <span *ngIf="formGroup.get('lastName')?.errors?.['minlength']">Last name must be at least 3
+                        characters.</span>
+                    <span *ngIf="formGroup.get('lastName')?.errors?.['maxlength']">Last name cannot exceed 50
+                        characters.</span>
+                    <span *ngIf="formGroup.get('lastName')?.errors?.['pattern']">Please enter valid letters only.</span>
+                </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1">
+                <label for="emergency-contact-name" class="block text-sm font-medium text-gray-700 mb-2">
+                    Emergency Contact Person
+                </label>
+                <input formControlName="emergencyContactName" type="text" name="emergency-contact-name"
+                    id="emergency-contact-name" placeholder="Enter emergency contact name"
+                    class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500"
+                    [ngClass]="{'border-red-500': formGroup.get('emergencyContactName')?.touched && formGroup.get('emergencyContactName')?.invalid}">
+                <div *ngIf="formGroup.get('emergencyContactName')?.touched && formGroup.get('emergencyContactName')?.invalid"
+                    class="text-red-500 text-sm mt-1">
+                    <span *ngIf="formGroup.get('emergencyContactName')?.errors?.['minlength']">Name must be at least 3
+                        characters.</span>
+                    <span *ngIf="formGroup.get('emergencyContactName')?.errors?.['maxlength']">Name cannot exceed 100
+                        characters.</span>
+                    <span *ngIf="formGroup.get('emergencyContactName')?.errors?.['pattern']">Please enter valid letters
+                        only.</span>
+                </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1">
+                <label for="emergency-contact-number" class="block text-sm font-medium text-gray-700 mb-2">
+                    Emergency Contact Number
+                </label>
+                <input formControlName="emergencyContactNumber" type="tel" name="emergency-contact-number"
+                    id="emergency-contact-number" placeholder="e.g., +91 9876543210"
+                    class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500"
+                    [ngClass]="{'border-red-500': formGroup.get('emergencyContactNumber')?.touched && formGroup.get('emergencyContactNumber')?.invalid}">
+                <div *ngIf="formGroup.get('emergencyContactNumber')?.touched && formGroup.get('emergencyContactNumber')?.invalid"
+                    class="text-red-500 text-sm mt-1">
+                    <span *ngIf="formGroup.get('emergencyContactNumber')?.errors?.['pattern']">
+                        Please enter a valid Indian phone number (e.g., +91 9876543210).
+                    </span>
                 </div>
             </div>
         </div>

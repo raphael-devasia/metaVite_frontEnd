@@ -9,21 +9,35 @@
             <div>
                 <label>Material</label>
                 <input type="text" formControlName="material" placeholder="Enter material" />
-                <div *ngIf="form.get('material')?.touched && form.get('material')?.hasError('required')"
+                <!-- <div *ngIf="form.get('material')?.touched && form.get('material')?.hasError('required')"
                     class="text-red-600">
                     Material is required.
+                </div> -->
+                <div *ngIf="form.get('material')?.invalid && form.get('material')?.touched" class="text-red-600">
+                    <small *ngIf="form.get('material')?.errors?.required">{{ errorMessages.material.required }}</small>
+                    <small *ngIf="!form.get('material')?.errors?.required && form.get('material')?.errors?.pattern">{{
+                        errorMessages.material.pattern }}</small>
+                    <small
+                        *ngIf="!form.get('material')?.errors?.required && !form.get('material')?.errors?.pattern && form.get('material')?.errors?.minLength">{{
+                        errorMessages.material.minLength }}</small>
                 </div>
+
             </div>
             <div>
-                <label>Quantity</label>
+                <label>Quantity in Tons</label>
                 <input type="number" formControlName="quantity" placeholder="Enter quantity" />
-                <div *ngIf="form.get('quantity')?.touched && form.get('quantity')?.hasError('required')"
+                <!-- <div *ngIf="form.get('quantity')?.touched && form.get('quantity')?.hasError('required')"
                     class="text-red-600">
                     Quantity is required.
-                </div>
-                <div *ngIf="form.get('quantity')?.touched && form.get('quantity')?.hasError('quantityInTons')"
-                    class="text-red-600">
-                    Quantity must be in tons.
+                </div> -->
+                
+                <div *ngIf="form.get('quantity')?.invalid && form.get('quantity')?.touched" class="text-red-600">
+                    <small *ngIf="form.get('quantity')?.errors?.required">{{ errorMessages.quantity.required }}</small>
+                    <small *ngIf="!form.get('quantity')?.errors?.required && form.get('quantity')?.errors?.min">{{
+                        errorMessages.quantity.min }}</small>
+                    <small
+                        *ngIf="!form.get('quantity')?.errors?.required && !form.get('quantity')?.errors?.min && form.get('quantity')?.errors?.max">{{
+                        errorMessages.quantity.max }}</small>
                 </div>
             </div>
         </div>
@@ -56,25 +70,26 @@
                     <div *ngIf="form.get('mhcvSubtype')?.value === 'trailer'">
                         <label>Trailer Feet</label>
                         <input type="number" formControlName="trailerFeet" placeholder="Enter trailer feet" />
-                        <div *ngIf="form.get('trailerFeet')?.touched && form.get('trailerFeet')?.hasError('trailerFeet')"
+                        <!-- <div *ngIf="form.get('trailerFeet')?.touched && form.get('trailerFeet')?.hasError('trailerFeet')"
                             class="text-red-600">
                             Trailer length must be between 12 and 60 feet.
+                        </div> -->
+                        <div *ngIf="form.get('trailerFeet')?.invalid && form.get('trailerFeet')?.touched" class="text-red-600">
+                            <small>{{ errorMessages.trailerFeet.invalid }}</small>
                         </div>
                     </div>
                     <div *ngIf="form.get('mhcvSubtype')?.value === 'tipper'">
                         <label>Tipper Load</label>
                         <input type="text" formControlName="tipperLoad" placeholder="Enter tipper load" />
-                        <div *ngIf="form.get('tipperLoad')?.touched && form.get('tipperLoad')?.hasError('tipperLoad')"
-                            class="text-red-600">
-                            Tipper load must be between 1 and 25 tons.
-                        </div>
+                    <div *ngIf="form.get('tipperLoad')?.invalid && form.get('tipperLoad')?.touched" class="text-red-600">
+                        <small>{{ errorMessages.tipperLoad.invalid }}</small>
+                    </div>
                     </div>
                     <div *ngIf="form.get('mhcvSubtype')?.value === 'transit-mixer'">
                         <label>Transit Mixer Capacity</label>
                         <input type="text" formControlName="mixerCapacity" placeholder="Enter capacity" />
-                        <div *ngIf="form.get('mixerCapacity')?.touched && form.get('mixerCapacity')?.hasError('mixerCapacity')"
-                            class="text-red-600">
-                            Mixer capacity must be between 1 and 15 cubic meters.
+                        <div *ngIf="form.get('mixerCapacity')?.invalid && form.get('mixerCapacity')?.touched" class="text-red-600">
+                            <small>{{ errorMessages.mixerCapacity.invalid }}</small>
                         </div>
                     </div>
                 </div>
@@ -114,10 +129,16 @@
                 <div>
                     <label>Dispatch Date and Time</label>
                     <input type="datetime-local" formControlName="dispatchDateTime" />
-                    <div *ngIf="form.get('dispatchDateTime')?.touched && form.get('dispatchDateTime')?.hasError('required')"
+                    <!-- <div *ngIf="form.get('dispatchDateTime')?.touched && form.get('dispatchDateTime')?.hasError('required')"
                         class="text-red-600">
                         Dispatch date and time are required.
+                    </div> -->
+                    <div *ngIf="form.get('dispatchDateTime')?.invalid && form.get('dispatchDateTime')?.touched" class="text-red-600">
+                        <small *ngIf="form.get('dispatchDateTime')?.errors?.required">{{ errorMessages.dispatchDateTime.required }}</small>
+                        <small *ngIf="form.get('dispatchDateTime')?.errors?.atLeast24HoursFromNow">{{
+                            errorMessages.dispatchDateTime.atLeast24HoursFromNow }}</small>
                     </div>
+
                     <div *ngIf="form.get('dispatchDateTime')?.touched && form.get('dispatchDateTime')?.hasError('futureDate')"
                         class="text-red-600">
                         Dispatch date and time must be in the future.

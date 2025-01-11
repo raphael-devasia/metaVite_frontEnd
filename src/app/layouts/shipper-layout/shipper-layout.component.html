@@ -21,7 +21,7 @@
     </div>
    
     <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Customers'">
-        <app-table [tabledata]="clientTableData"></app-table>
+        <app-table [tabledata]="clientTableData" [updateResource]="updateResource.bind(this)"></app-table>
     </div>
     <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Pick-up Locations'">
         <app-table [tabledata]="pickupTableData"  [updateResource]="updateResource.bind(this)"></app-table>

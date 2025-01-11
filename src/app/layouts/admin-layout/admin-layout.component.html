@@ -8,8 +8,21 @@
     <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Drivers'">
         <app-table [tabledata]="driverTableData"></app-table>
     </div>
+    <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Dashboard'">
+        <app-admin-dashboard [fullData]="dashBoardData"></app-admin-dashboard>
+    </div>
+
     <div class="w-5/6 h-full" *ngIf="!showForm && !showModal &&!showVehicleForm  && selectedComponent === 'Trucks'">
         <app-table [tabledata]="truckTableData"></app-table>
+    </div>
+    <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Shipments'">
+        <app-table [tabledata]="shipmentTableData"></app-table>
+    </div>
+    <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Active Bids'">
+        <app-table [tabledata]="bidTableData"></app-table>
+    </div>
+    <div class="w-5/6 h-full" *ngIf="!showForm && !showModal && selectedComponent === 'Payments'">
+        <app-table [tabledata]="paymentTableData"></app-table>
     </div>
 
     <!-- Form -->

@@ -3,3 +3,5 @@ export const environment = {
   SOCKET_ENDPOINT: 'ws://localhost:3000',
   SOCKET_ENDPOINT2: 'ws://localhost:5001',
 };
+
+

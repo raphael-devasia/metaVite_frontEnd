@@ -6,10 +6,12 @@ import { CommonModule } from '@angular/common';
 import { DataService } from '../../shared/services/data.service';
 import { FormComponent } from '../../shared/components/form/form.component';
 import { UserService } from '../../core/services/user/user.service';
-import { tap } from 'rxjs';
+import { forkJoin, tap } from 'rxjs';
 import { DriverService } from '../driver-layout/services/driver.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CarrierService } from '../../features/carrier/services/carrier.service';
+import { Router } from '@angular/router';
+import { AdminDashboardComponent } from '../../shared/components/admin-dashboard/admin-dashboard.component';
 interface FormField {
   id: string;
   label: string;
@@ -17,6 +19,17 @@ interface FormField {
   placeholder: string;
   value?: string;
   disabled?: boolean;
+}
+interface Bid {
+  _id: string;
+  loadId: string;
+  dropCity: string;
+  commodity: string;
+  vehicleType: string;
+  trailerType: string;
+  basePrice: string;
+  lowestBid: string;
+  status: string;
 }
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -36,12 +49,16 @@ function formatDate(dateString: string): string {
     TableComponent,
     CommonModule,
     FormComponent,
+    AdminDashboardComponent,
   ],
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.css',
 })
 export class AdminLayoutComponent implements OnInit {
-  constructor(@Inject(DataService) private dataService: DataService) {}
+  constructor(
+    @Inject(DataService) private dataService: DataService,
+    private router: Router
+  ) {}
   UserServices = inject(UserService);
 
   private fb = inject(FormBuilder);
@@ -50,6 +67,7 @@ export class AdminLayoutComponent implements OnInit {
   isDriver: boolean = false;
   role: string = 'appAdmin';
   dataToShow: string = 'Trucks';
+  dashBoardData: any;
 
   personalInformation: FormField[] = [
     {
@@ -284,7 +302,6 @@ export class AdminLayoutComponent implements OnInit {
       label: 'Company Reference ID',
       type: 'text',
       placeholder: 'Enter Company Reference ID',
-      
     },
   ];
 
@@ -351,6 +368,7 @@ export class AdminLayoutComponent implements OnInit {
     InsuranceProvider: ['', Validators.required],
     PolicyNumber: ['', Validators.required],
     ExpiryDate: ['', Validators.required],
+    isActive: [true, Validators.requiredTrue],
 
     // System Metadata
     _id: [{ value: '', disabled: true }],
@@ -369,22 +387,43 @@ export class AdminLayoutComponent implements OnInit {
       'License Plate', // New Heading 5
       'Owner Name', // New Heading 6
       'Fuel Type',
+      'Actions',
     ],
     tableData: [],
   };
+  bidTableData = {
+    title: 'All Bids',
+    button: 'Add New Load',
+    statuses: ['Open ', 'Closed'],
+    tableHeads: [
+      'Load ID',
+      'Drop City',
+      'Commodity',
+      'Vehicle Body',
+      'Trailer Type',
+
+      'Base Price',
+      'Lowest Bid',
+      'Status',
+      'Actions',
+    ],
+    tableData: [] as Bid[],
+  };
 
   // UI Management
-  buttonTexts: string[] = [
-    'Dashboard',
-    'Active Bids',
-    'Shipments',
-    'Shippers',
-    'Carriers',
-    'Drivers',
-    'Trucks',
-    'Payment',
-    'Notifications',
+  buttonTexts = [
+    { text: 'Dashboard', icon: 'dashboard' },
+    { text: 'Active Bids', icon: 'gavel' },
+    { text: 'Shipments', icon: 'local_shipping' },
+    // { text: 'Shippers', icon: 'business' },
+    // { text: 'Carriers', icon: 'delivery_dining' },
+    { text: 'Drivers', icon: 'person' },
+    { text: 'Trucks', icon: 'local_shipping' },
+    { text: 'Payments', icon: 'payment' },
+    // { text: 'Notifications', icon: 'notifications' },
+    { text: 'Log Out', icon: 'logout' },
   ];
+
   driverTableData = {
     title: 'Drivers',
     button: 'Add Driver',
@@ -394,9 +433,43 @@ export class AdminLayoutComponent implements OnInit {
       'Email',
       'Phone',
       'Status',
-      '  user ID',
-      'Company Name',
-      'companyRefId',
+      'UserID',
+      'DOB',
+      'Aadhar Number',
+      'Actions',
+    ],
+    tableData: [],
+  };
+  shipmentTableData = {
+    title: 'All Shipments',
+    button: '',
+    statuses: ['Assigned ', 'Dispatched', 'Delivered'],
+    tableHeads: [
+      'Load ID',
+      'Drop City',
+      'Pick City',
+
+      'Pickup Date',
+
+      'Base Price',
+      'Bid Price',
+      'Status',
+      'Actions',
+    ],
+    tableData: [],
+  };
+  paymentTableData = {
+    title: 'All Payments',
+    button: '',
+    statuses: [],
+    tableHeads: [
+      'Load Id',
+      'Destination City',
+      'Shipper Name',
+      'Shipper Ref_id',
+      'Amount',
+      'payment Status',
+      'Action',
     ],
     tableData: [],
   };
@@ -413,10 +486,8 @@ export class AdminLayoutComponent implements OnInit {
         .pipe(
           tap((data: any) => {
             console.log(data);
-            
+
             const drivers = data.filter(
-            
-              
               (driver: any) => driver.isBoardingCompleted
             );
             // Populate driverTableData with the fetched drivers
@@ -431,9 +502,15 @@ export class AdminLayoutComponent implements OnInit {
                   driver.personalDetails?.emergencyContact?.phoneNumber || '',
                 status: driver.status || 'Unknown', // Add logic for status if not in data
                 username: driver.username || '',
-                company: driver.companyDetails?.companyName || 'No Company', // Add company name if available
-                companyRefId: driver?.companyRefId || 'No Company',
-                workStatus: driver?.workStatus || 'No Status',
+                dateOfBirth: driver.dateOfBirth
+                  ? new Date(driver.dateOfBirth).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  : 'Not Avilable',
+
+                aadharCardNumber: driver.aadharCardNumber || 'Not Available',
                 id: driver._id,
               })),
             };
@@ -447,10 +524,38 @@ export class AdminLayoutComponent implements OnInit {
             this.selectedComponent = component;
             this.showForm = false;
             this.showModal = false;
-            this.showVehicleForm=false
+            this.showVehicleForm = false;
           },
           error: (err) => {
             console.error('Failed to fetch drivers:', err);
+          },
+        });
+    }
+    if (component === 'Dashboard') {
+      // Fetching multiple API calls in parallel using forkJoin
+      forkJoin({
+        payments: this.UserServices.getAllPayments(),
+      })
+        .pipe(
+          tap(({ payments }) => {
+            if (payments) {
+              console.log(payments);
+              const data = payments.payments;
+              this.dashBoardData = data;
+            }
+
+            // Set selected component and hide modal/form
+            this.selectedComponent = component;
+            this.showForm = false;
+            this.showModal = false;
+          })
+        )
+        .subscribe({
+          next: () => {
+            console.log('Data fetched and processed successfully');
+          },
+          error: (err) => {
+            console.error('Error fetching data', err);
           },
         });
     }
@@ -487,6 +592,150 @@ export class AdminLayoutComponent implements OnInit {
           },
           error: (err) => {
             console.error('Failed to fetch trucks:', err);
+          },
+        });
+    }
+    if (component === 'Log Out') {
+      localStorage.removeItem('appAdminToken');
+      localStorage.removeItem('appAdminData');
+      this.router.navigate(['/admin']);
+    }
+    if (component === 'Shipments') {
+      this.UserServices.getAllShipments('admin')
+        .pipe(
+          tap((bids: any) => {
+            // Populate driverTableData with the fetched drivers
+            console.log(bids.bids);
+            const data = bids.bids;
+
+            // Filter bids where status is not "Open" or "Closed"
+            const filteredData = data.filter(
+              (bid: any) =>
+                bid.status === 'Assigned' ||
+                bid.status === 'Dispatched' ||
+                bid.status === 'Delivered' ||
+                bid.status === 'Picked' ||
+                bid.status === 'Delivered1' ||
+                bid.status === 'Delivered2' ||
+                bid.status === 'Delivered3' ||
+                bid.status === 'Delivered' ||
+                bid.status === 'Delivered1-Partial' ||
+                bid.status === 'Delivered2-Partial' ||
+                bid.status === 'Delivered3-Partial' ||
+                bid.status === 'Delivered' ||
+                bid.status === 'Completed'
+            );
+            this.shipmentTableData = {
+              ...this.shipmentTableData,
+              tableData: filteredData.map((bid: any) => ({
+                loadId: bid.loadId || '',
+                dropCity: bid.dropoff1?.address?.city || '',
+                pickCity: bid.pickupLocation?.address?.city || '',
+
+                pickUpdate: this.getReadableDate(bid.dispatchDateTime) || '',
+
+                basePrice: bid.basePrice || '',
+                lowestBid: bid.lowestPrice || '--',
+                status: bid.status,
+                _id: bid._id,
+              })),
+            };
+          })
+        )
+        .subscribe({
+          next: () => {
+            // Proceed only after driverTableData has been populated
+
+            this.selectedComponent = component;
+            this.showForm = false;
+            this.showModal = false;
+            this.showVehicleForm = false;
+          },
+          error: (err) => {},
+        });
+    }
+    if (component === 'Active Bids') {
+      this.UserServices.getAllBids('admin')
+        .pipe(
+          tap((bids: any) => {
+            // Populate driverTableData with the fetched drivers
+            console.log(bids.loads);
+            const data = bids.loads;
+
+            // Filter bids where status is not "Open" or "Closed"
+            const filteredData = data.filter(
+              (bid: any) => bid.status === 'Open' || bid.status === 'Closed'
+            );
+            this.bidTableData = {
+              ...this.bidTableData,
+              tableData: filteredData.map((bid: any) => ({
+                loadId: bid.loadId || '',
+                dropCity: bid.dropoff1?.address?.city || '',
+                commodity: bid.material || 'Unknown', // Add logic for status if not in data
+                vehicleType: bid.vehicleBody || '',
+                trailerType: bid.vehicleType || '',
+                basePrice: bid.basePrice || '',
+                lowestBid: bid.lowestPrice || '--',
+                status: bid.status,
+                _id: bid._id,
+              })),
+            };
+          })
+        )
+        .subscribe({
+          next: () => {
+            console.log(this.bidTableData);
+            // Only update these after data is received
+            this.selectedComponent = component;
+            this.showForm = false;
+            this.showModal = false;
+            this.showVehicleForm = false;
+          },
+          error: (err) => {
+            console.error('Error fetching bids', err);
+          },
+        });
+    }
+    if (component === 'Payments') {
+      this.UserServices
+        .getAllPayments()
+        .pipe(
+          tap((payments: any) => {
+            // Populate driverTableData with the fetched drivers
+
+            // Filter payments by shipperId
+            const filteredPayments = payments.payments
+            console.log(filteredPayments);
+
+            this.paymentTableData = {
+              ...this.paymentTableData,
+              tableData: filteredPayments.map((payment: any) => ({
+                loadId: payment?.loadDetails?.loadId || '',
+                destinationCity:
+                  payment.loadDetails.dropoff1.address.city || '',
+                carrierName:
+                  payment.shipperDetails?.companyDetails?.companyName || '',
+                carrierRefId: payment.shipperDetails?.companyRefId || '',
+                amount: payment.amount || '',
+                paymentStatus: payment.status || 'Unknown',
+                id: payment.loadId,
+
+                // status: client.status || 'Unknown',
+              })),
+            };
+          })
+        )
+        .subscribe({
+          next: () => {
+            // Proceed only after driverTableData has been populated
+
+            this.selectedComponent = component;
+            this.showForm = false;
+            this.showModal = false;
+            this.showVehicleForm = false;
+          },
+          error: (err: any) => {
+            console.error('Failed to fetch customers:', err);
           },
         });
     }
@@ -572,7 +821,6 @@ export class AdminLayoutComponent implements OnInit {
 
               this.vehicleStatus = truck.Status;
               console.log(this.vehicleStatus);
-              
 
               this.vehicleForm.patchValue({
                 VehicleType: truck.VehicleType || '',
@@ -617,6 +865,17 @@ export class AdminLayoutComponent implements OnInit {
       console.log(receivedData);
 
       this.handleAction(receivedData);
+    });
+  }
+  getReadableDate(isoDate: string): string {
+    const date = new Date(isoDate);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
     });
   }
 }

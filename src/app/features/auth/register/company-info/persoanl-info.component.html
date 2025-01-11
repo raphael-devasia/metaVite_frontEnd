@@ -1,4 +1,4 @@
-<div class="bg-white p-6">
+<!-- <div class="bg-white p-6">
   <h2 class="text-lg font-medium mb-6">Company Information</h2>
   <form [formGroup]="formGroup">
     <div class="grid grid-cols-2 gap-6">
@@ -36,5 +36,73 @@
       </div>
     </div>
     
+  </form>
+</div> -->
+<div class="bg-white p-6">
+  <h2 class="text-lg font-medium mb-6">Company Information</h2>
+  <form [formGroup]="formGroup">
+    <div class="grid grid-cols-2 gap-6">
+      <div class="col-span-2 sm:col-span-1">
+        <label for="company-name" class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+        <input type="text" formControlName="companyName" name="company-name" id="company-name"
+          placeholder="Enter your company name"
+          class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500"
+          [ngClass]="{'border-red-500': formGroup.get('companyName')?.touched && formGroup.get('companyName')?.invalid}">
+        <div *ngIf="formGroup.get('companyName')?.touched && formGroup.get('companyName')?.invalid"
+          class="text-red-500 text-sm mt-1">
+          <span *ngIf="formGroup.get('companyName')?.errors?.['required']">Company name is required.</span>
+          <span *ngIf="formGroup.get('companyName')?.errors?.['minlength']">Company name must be at least 3
+            characters.</span>
+          <span *ngIf="formGroup.get('companyName')?.errors?.['maxlength']">Company name cannot exceed 100
+            characters.</span>
+          <span *ngIf="formGroup.get('companyName')?.errors?.['pattern']">Company name can only contain letters,
+            numbers, and basic punctuation.</span>
+        </div>
+      </div>
+
+      <div class="col-span-2 sm:col-span-1">
+        <label for="company-email" class="block text-sm font-medium text-gray-700 mb-2">Company Email</label>
+        <input type="email" formControlName="companyEmail" name="company-email" id="company-email"
+          placeholder="e.g., contact@company.com"
+          class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500"
+          [ngClass]="{'border-red-500': formGroup.get('companyEmail')?.touched && formGroup.get('companyEmail')?.invalid}">
+        <div *ngIf="formGroup.get('companyEmail')?.touched && formGroup.get('companyEmail')?.invalid"
+          class="text-red-500 text-sm mt-1">
+          <span *ngIf="formGroup.get('companyEmail')?.errors?.['required']">Company email is required.</span>
+          <span
+            *ngIf="formGroup.get('companyEmail')?.errors?.['email'] || formGroup.get('companyEmail')?.errors?.['pattern']">
+            Please enter a valid email address.
+          </span>
+        </div>
+      </div>
+
+      <div class="col-span-2 sm:col-span-1">
+        <label for="company-phone" class="block text-sm font-medium text-gray-700 mb-2">Company Phone Number</label>
+        <input type="tel" formControlName="companyPhone" name="company-phone" id="company-phone"
+          placeholder="e.g., +91 9876543210"
+          class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500"
+          [ngClass]="{'border-red-500': formGroup.get('companyPhone')?.touched && formGroup.get('companyPhone')?.invalid}">
+        <div *ngIf="formGroup.get('companyPhone')?.touched && formGroup.get('companyPhone')?.invalid"
+          class="text-red-500 text-sm mt-1">
+          <span *ngIf="formGroup.get('companyPhone')?.errors?.['required']">Company phone number is required.</span>
+          <span *ngIf="formGroup.get('companyPhone')?.errors?.['pattern']">Please enter a valid Indian phone number
+            (e.g., +91 9876543210).</span>
+        </div>
+      </div>
+
+      <div class="col-span-2 sm:col-span-1">
+        <label for="tax-number" class="block text-sm font-medium text-gray-700 mb-2">GSTIN</label>
+        <input type="text" formControlName="taxId" name="tax-number" id="tax-number"
+          placeholder="Enter your 15-digit GSTIN"
+          class="w-full py-3 px-4 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500"
+          [ngClass]="{'border-red-500': formGroup.get('taxId')?.touched && formGroup.get('taxId')?.invalid}">
+        <div *ngIf="formGroup.get('taxId')?.touched && formGroup.get('taxId')?.invalid"
+          class="text-red-500 text-sm mt-1">
+          <span *ngIf="formGroup.get('taxId')?.errors?.['required']">GSTIN is required.</span>
+          <span *ngIf="formGroup.get('taxId')?.errors?.['pattern']">Please enter a valid GSTIN (e.g.,
+            22AAAAA0000A1Z5).</span>
+        </div>
+      </div>
+    </div>
   </form>
 </div>

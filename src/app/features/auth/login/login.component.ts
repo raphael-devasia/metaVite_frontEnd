@@ -44,9 +44,7 @@ export class LoginComponent implements OnInit {
       const driverToken = localStorage.getItem('driverToken');
 
     // Check if the token is present and the current path is '/carrier'
-    if (carrierAdminToken && this.router.url === '/carrier') {
-      
-      
+    if (carrierAdminToken && this.router.url === '/carrier-admin') {
       // Redirect to '/carrier/admin/dashboard'
       this.router.navigate(['/carrier/admin/dashboard']);
     }

@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ShipperService {
-  private baseUrl = 'http://localhost:4000/';
+  // private baseUrl = 'http://localhost:4000/';
+  private baseUrl = 'http://a4624d01d367b4e51ae51cbe6f066c92-452922102.eu-north-1.elb.amazonaws.com:4000/';
   http = inject(HttpClient);
   constructor() {}
   addClients(client: any): Observable<any> {
@@ -25,7 +26,7 @@ export class ShipperService {
   getAllPayments(): Observable<any> {
     return this.http.get(`${this.baseUrl}shipper/payments`);
   }
-  getPayment(loadId:string): Observable<any> {
+  getPayment(loadId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}shipper/payments/${loadId}`);
   }
 
@@ -69,12 +70,12 @@ export class ShipperService {
       bidId
     );
   }
-  updateLoadStatus(userId: string, status: string): Observable<any> {
-    return this.http.post(
-      `${this.baseUrl}shipper/update-load-status/${userId}`,
-      status
-    );
-  }
+  // updateLoadStatus(userId: string, status: string): Observable<any> {
+  //   return this.http.post(
+  //     `${this.baseUrl}shipper/update-load-status/${userId}`,
+  //     status
+  //   );
+  // }
   // Create Razorpay Order on the backend
   createRazorpayOrder(
     amount: number,

@@ -1,35 +1,84 @@
-<div class="form-container w-full">
-    <h1>{{ formTitle }}</h1>
-    <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="w-full">
-        <div class="form-grid">
-            <!-- Vehicle Information Fields -->
-            <div *ngFor="let field of vehicleInformation" class="form-field">
-                <label [for]="field.id">{{ field.label }}</label>
-                <input *ngIf="field.type !== 'date'" [id]="field.id" [type]="field.type"
-                    [placeholder]="field.placeholder" [formControlName]="field.id" [disabled]="field.disabled" />
-                <input *ngIf="field.type === 'date'" [id]="field.id" [type]="field.type"
-                    [placeholder]="field.placeholder" [formControlName]="field.id" />
-                <div *ngIf="vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched"
-                    class="error-message">
-                    <p>Invalid {{ field.label }}</p>
-                </div>
-            </div>
+<div class="form-container max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg h-fit">
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">{{ formTitle }}</h1>
 
-            <!-- Insurance Information Fields -->
-            <div *ngFor="let field of insuranceInformation" class="form-field">
-                <label [for]="field.id">{{ field.label }}</label>
-                <input *ngIf="field.type !== 'date'" [id]="field.id" [type]="field.type"
-                    [placeholder]="field.placeholder" [formControlName]="field.id" />
-                <input *ngIf="field.type === 'date'" [id]="field.id" [type]="field.type"
-                    [placeholder]="field.placeholder" [formControlName]="field.id" />
-                <div *ngIf="vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched"
-                    class="error-message">
-                    <p>Invalid {{ field.label }}</p>
+    <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="w-full">
+        <!-- Vehicle Information Section -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Vehicle Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let field of vehicleInformation" class="form-field">
+                    <label [for]="field.id" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ field.label }}
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    <!-- Select Input -->
+                    <select *ngIf="field.type === 'select'" [id]="field.id" [formControlName]="field.id"
+                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white
+                         [ngClass]={'border-red-500': vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched}">
+                        <option value="" disabled selected>{{ field.placeholder }}</option>
+                        <option *ngFor="let option of field.options" [value]="option">{{ option }}</option>
+                    </select>
+
+                    <!-- Regular Input -->
+                    <input *ngIf="field.type !== 'select' && field.type !== 'date'" [id]="field.id" [type]="field.type"
+                        [placeholder]="field.placeholder" [formControlName]="field.id" [disabled]="field.disabled"
+                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                        [ngClass]={'border-red-500': vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched}" />
+
+                    <!-- Date Input -->
+                    <input *ngIf="field.type === 'date'" [id]="field.id" [type]="field.type"
+                        [formControlName]="field.id"
+                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                        [ngClass]={'border-red-500': vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched}" />
+
+                    <!-- Error Messages -->
+                    <div *ngIf="vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched"
+                        class="text-red-500 text-sm mt-1 space-y-1">
+                        {{ getErrorMessage(field.id) }}
+                    </div>
                 </div>
             </div>
         </div>
 
-        <button type="submit" [disabled]="vehicleForm.invalid">Submit</button>
-        
+        <!-- Insurance Information Section -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Insurance Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let field of insuranceInformation" class="form-field">
+                    <label [for]="field.id" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ field.label }}
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    <!-- Date Input -->
+                    <input *ngIf="field.type === 'date'" [id]="field.id" [type]="field.type"
+                        [formControlName]="field.id"
+                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                        [ngClass]={'border-red-500': vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched}" />
+
+                    <!-- Regular Input -->
+                    <input *ngIf="field.type !== 'date'" [id]="field.id" [type]="field.type"
+                        [placeholder]="field.placeholder" [formControlName]="field.id"
+                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                        [ngClass]={'border-red-500': vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched}" />
+
+                    <!-- Error Messages -->
+                    <div *ngIf="vehicleForm.get(field.id)?.invalid && vehicleForm.get(field.id)?.touched"
+                        class="text-red-500 text-sm mt-1 space-y-1">
+                        {{ getErrorMessage(field.id) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-center">
+            <button type="submit" [disabled]="vehicleForm.invalid" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     transition-colors duration-200">
+                Submit Vehicle Information
+            </button>
+        </div>
     </form>
 </div>

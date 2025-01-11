@@ -37,18 +37,54 @@ export class PersoanlInfoComponent implements OnInit {
     private store: Store<UserRegistrationState>
   ) {
     this.formGroup = this.fb.group({
-      companyName: ['', Validators.required],
-      companyEmail: ['', [Validators.required, Validators.email]],
+      companyName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(100),
+          Validators.pattern(/^[a-zA-Z0-9][\sa-zA-Z0-9-&.,]+[a-zA-Z0-9]$/),
+          // Allows letters, numbers, spaces, hyphens, ampersands, dots, and commas
+          // Must start and end with alphanumeric
+        ],
+      ],
+
+      companyEmail: [
+        '',
+        [
+          Validators.required,
+          Validators.email,
+          Validators.pattern(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
+          // Stricter email validation
+        ],
+      ],
+
       companyPhone: [
         '',
         [
           Validators.required,
           Validators.pattern(
-            /^\+?\d{1,4}[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/
+            /^(?:(?:\+|0{0,2})91(\s*[-]\s*)?|[0]?)?[6789]\d{9}$/
           ),
+          // Indian phone number validation:
+          // - Optional +91 or 91 prefix
+          // - Must start with 6, 7, 8, or 9
+          // - Total 10 digits after prefix
         ],
       ],
-      taxId: ['', Validators.required],
+
+      taxId: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(
+            /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/
+          ),
+          // GSTIN validation:
+          // - 15 characters
+          // - Format: 22AAAAA0000A1Z5
+        ],
+      ],
     });
   }
 
@@ -75,11 +111,19 @@ export class PersoanlInfoComponent implements OnInit {
     });
 
     this.formGroup.statusChanges.subscribe((status) => {
-      if (this.formGroup.valid) {
-        this.buttonActivate.emit(true);
-      } else {
-        this.buttonActivate.emit(false);
-      }
+      // if (this.formGroup.valid) {
+      //   this.buttonActivate.emit(true);
+      // } else {
+      //   this.buttonActivate.emit(false);
+      // }
+       if (status === 'VALID') {
+         
+         this.buttonActivate.emit(true); // Emit true if form is valid
+       } else {
+        
+
+         this.buttonActivate.emit(false); // Emit false if form is not valid
+       }
     });
 
     this.submitEvent.subscribe(() => this.onsubmit());
@@ -119,5 +163,41 @@ export class PersoanlInfoComponent implements OnInit {
         console.log('Updated User in the company info:', updatedUser);
       }
     });
+  }
+  getErrorMessage(controlName: string): string {
+    const control = this.formGroup.get(controlName);
+    if (!control) return '';
+
+    if (control.hasError('required')) {
+      return `${controlName} is required`;
+    }
+
+    switch (controlName) {
+      case 'companyName':
+        if (control.hasError('minlength'))
+          return 'Company name must be at least 3 characters';
+        if (control.hasError('maxlength'))
+          return 'Company name cannot exceed 100 characters';
+        if (control.hasError('pattern'))
+          return 'Company name can only contain letters, numbers, and basic punctuation';
+        break;
+
+      case 'companyEmail':
+        if (control.hasError('email') || control.hasError('pattern'))
+          return 'Please enter a valid email address';
+        break;
+
+      case 'companyPhone':
+        if (control.hasError('pattern'))
+          return 'Please enter a valid Indian phone number (e.g., +91 9876543210)';
+        break;
+
+      case 'taxId':
+        if (control.hasError('pattern'))
+          return 'Please enter a valid GSTIN (e.g., 22AAAAA0000A1Z5)';
+        break;
+    }
+
+    return '';
   }
 }

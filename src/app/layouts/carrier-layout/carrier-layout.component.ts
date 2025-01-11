@@ -38,7 +38,7 @@ function formatDate(dateString: string): string {
 
   return `${year}-${month}-${day}`;
 }
-type BidAction = { type: 'Bid'; data: string };
+type BidAction = { type: 'Bid' |'BidAgain'; data: string  };
 type EditViewAction = { type: 'edit' | 'view'; data: string };
 type DeleteAction = { type: 'delete'; data?: string };
 type LegacyAction = { action: string; id: string; item: string };
@@ -71,17 +71,18 @@ export class CarrierLayoutComponent {
     public carrierService: CarrierService,
     @Inject(DataService) private dataService: DataService
   ) {}
-  buttonTexts: string[] = [
-    'Dashboard',
-    'Search & Bid',
-    'Active Bids',
-    'Shipments',
-    'Drivers',
-    'Trucks',
-    'Payments',
-    // 'Notifications',
-    'Log Out',
+  buttonTexts = [
+    { text: 'Dashboard', icon: 'dashboard' },
+    { text: 'Search & Bid', icon: 'search' },
+    { text: 'Active Bids', icon: 'gavel' },
+    { text: 'Shipments', icon: 'local_shipping' },
+    { text: 'Drivers', icon: 'person' },
+    { text: 'Trucks', icon: 'local_shipping' },
+    { text: 'Payments', icon: 'payment' },
+    { text: 'Company Details', icon: 'payment' },
+    { text: 'Log Out', icon: 'logout' },
   ];
+
   driverTableData = {
     title: 'Drivers',
     button: 'Add Driver',
@@ -103,6 +104,7 @@ export class CarrierLayoutComponent {
   showForm: boolean = false;
   showModal: boolean = false;
   showVehicleForm: boolean = false;
+  showCompanyForm: boolean = false;
 
   UserServices = inject(UserService);
   ShipperServices = inject(ShipperService);
@@ -449,11 +451,48 @@ export class CarrierLayoutComponent {
     InsuranceProvider: ['', Validators.required],
     PolicyNumber: ['', Validators.required],
     ExpiryDate: ['', Validators.required],
+    isActive: [true, Validators.requiredTrue],
 
     // System Metadata
     _id: [''],
     __v: [{ value: '', disabled: true }],
   });
+  companyInfoForm: FormGroup = this.fb.group({
+    companyName: ['', Validators.required], // Company name from `companyDetails.companyName`
+    companyEmail: [
+      { value: '', disabled: true }, // Company email from `companyDetails.companyEmail`
+      [Validators.required, Validators.email],
+    ],
+    companyPhone: [
+      '',
+      [Validators.required, Validators.pattern('^\\+?[0-9]{10,15}$')], // Company phone with validation
+    ],
+    taxId: ['', Validators.required], // Tax ID from `companyDetails.taxId`
+    addressLine1: ['', Validators.required], // Address line 1 from `companyDetails.address.addressLine1`
+    addressLine2: ['', Validators.required], // Address line 2 from `companyDetails.address.addressLine2`
+    city: ['', Validators.required], // City from `companyDetails.address.city`
+    state: ['', Validators.required], // State from `companyDetails.address.state`
+    postalCode: [
+      '',
+      [Validators.required, Validators.pattern('^[0-9]{6}$')], // Postal code from `companyDetails.address.postalCode`
+    ],
+    companyRefId: [
+      { value: '', disabled: true },
+      Validators.required, // Company reference ID from `companyRefId`
+    ],
+    _id: [''], // MongoDB `_id` field
+    // Bank Details
+    bankName: ['', Validators.required], // Bank name
+    accountNumber: [
+      '',
+      [Validators.required, Validators.pattern('^[0-9]{9,18}$')], // Account number (9–18 digits)
+    ],
+    ifscCode: [
+      '',
+      [Validators.required, Validators.pattern('^[A-Z]{4}0[A-Z0-9]{6}$')], // IFSC code validation
+    ],
+  });
+
   // UI Management
   truckTableData = {
     title: 'All Trucks',
@@ -516,12 +555,14 @@ export class CarrierLayoutComponent {
     tableHeads: [
       'Load ID',
       'Drop City',
-      'Commodity',
-      'Shipper Name',
+      'Pick City',
+
       'Pickup Date',
 
       'Base Price',
       'Bid Price',
+      'Status',
+      'Actions',
     ],
     tableData: [],
   };
@@ -575,6 +616,7 @@ export class CarrierLayoutComponent {
             this.showForm = false;
             this.showModal = false;
             this.showVehicleForm = false;
+            this.showCompanyForm = false;
           },
           error: (err) => {},
         });
@@ -582,15 +624,22 @@ export class CarrierLayoutComponent {
     if (component === 'Active Bids') {
       let user = this.localStorageServices.getCarrierAdminData();
       this.carrierService
-        .getAllBids(user.companyRefId)
+        .getActiveBids(user.companyRefId)
         .pipe(
           tap((bids: any) => {
             // Populate driverTableData with the fetched drivers
             console.log(bids.loads);
             const data = bids.loads;
+            const filteredData = data.filter(
+              (bid: any) =>
+                bid.status !== 'Assigned' &&
+                bid.status !== 'Dispatched' &&
+                bid.status !== 'Delivered' &&
+                bid.status !== 'Cancelled'
+            );
             this.activeBidTableData = {
               ...this.activeBidTableData,
-              tableData: data.map((bid: any) => ({
+              tableData: filteredData.map((bid: any) => ({
                 loadId: bid.loadId || '',
                 dropCity: bid.dropoff1?.address?.city || '',
                 commodity: bid.material || 'Unknown', // Add logic for status if not in data
@@ -611,6 +660,7 @@ export class CarrierLayoutComponent {
             this.showForm = false;
             this.showModal = false;
             this.showVehicleForm = false;
+            this.showCompanyForm = false;
           },
           error: (err) => {},
         });
@@ -632,18 +682,30 @@ export class CarrierLayoutComponent {
               (bid: any) =>
                 bid.status === 'Assigned' ||
                 bid.status === 'Dispatched' ||
-                bid.status === 'Delivered'
+                bid.status === 'Delivered' ||
+                bid.status === 'Picked' ||
+                bid.status === 'Delivered1' ||
+                bid.status === 'Delivered2' ||
+                bid.status === 'Delivered3' ||
+                bid.status === 'Delivered' ||
+                bid.status === 'Delivered1-Partial' ||
+                bid.status === 'Delivered2-Partial' ||
+                bid.status === 'Delivered3-Partial' ||
+                bid.status === 'Delivered' ||
+                bid.status === 'Completed'
             );
             this.shipmentTableData = {
               ...this.shipmentTableData,
               tableData: filteredData.map((bid: any) => ({
-                loadId: bid.email || '',
+                loadId: bid.loadId || '',
                 dropCity: bid.dropoff1?.address?.city || '',
-                commodity: bid.material || 'Unknown', // Add logic for status if not in data
-                vehicleType: bid.vehicleBody || '',
-                trailerType: bid.vehicleType || '',
+                pickCity: bid.pickupLocation?.address?.city || '',
+
+                pickUpdate: this.getReadableDate(bid.dispatchDateTime) || '',
+
                 basePrice: bid.basePrice || '',
-                lowestBid: bid.basePrice || '',
+                lowestBid: bid.lowestPrice || '--',
+                status: bid.status,
                 _id: bid._id,
               })),
             };
@@ -657,12 +719,14 @@ export class CarrierLayoutComponent {
             this.showForm = false;
             this.showModal = false;
             this.showVehicleForm = false;
+            this.showCompanyForm = false;
           },
           error: (err) => {},
         });
     }
     if (component === 'Payments') {
-      this.carrierService.getAllPayments()
+      this.carrierService
+        .getAllPayments()
         .pipe(
           tap((payments: any) => {
             // Populate driverTableData with the fetched drivers
@@ -698,11 +762,57 @@ export class CarrierLayoutComponent {
             this.selectedComponent = component;
             this.showForm = false;
             this.showModal = false;
+            this.showCompanyForm = false;
           },
           error: (err) => {
             console.error('Failed to fetch customers:', err);
           },
         });
+    }
+    if (component === 'Company Details') {
+      this.carrierService.getShipperInfo(this.carrierRefId).subscribe({
+        next: (data) => {
+          console.log(data);
+
+          if (data.success) {
+            const user = data.user;
+
+            this.companyInfoForm.patchValue({
+              firstName: user.name?.firstName || '',
+              lastName: user.name?.lastName || '',
+              email: user.companyDetails?.companyEmail || '',
+              phoneNumber: user.companyDetails?.companyPhone || '',
+              companyEmail: user.companyDetails?.companyEmail || '',
+              companyPhone: user.companyDetails?.companyPhone || '',
+
+              companyRefId: user.companyRefId || '',
+              companyName: user.companyDetails?.companyName || '',
+              addressLine1: user.companyDetails?.address?.addressLine1 || '',
+              addressLine2: user.companyDetails?.address?.addressLine2 || '',
+              city: user.companyDetails?.address?.city || '',
+              state: user.companyDetails?.address?.state || '',
+              postalCode: user.companyDetails?.address?.postalCode || '',
+              bankName: user.bankDetails?.bankName || '',
+              ifscCode: user.bankDetails?.ifscCode || '',
+              accountNumber: user.bankDetails?.accountNumber || '',
+              _id: user._id || '',
+            });
+
+            // Set showForm to true and showModal to false after populating the data
+            this.formTitle = 'Carrier Company Details';
+            this.isDriver = false;
+            this.action = 'edit';
+            this.showForm = false;
+            this.showModal = false;
+            this.showCompanyForm = true;
+
+            this.selectedComponent = component;
+          }
+        },
+        error: (err) => {
+          console.error('Failed to fetch driver data', err);
+        },
+      });
     }
 
     if (component === 'Drivers') {
@@ -733,7 +843,7 @@ export class CarrierLayoutComponent {
                     })
                   : '',
 
-                aadharCardNumber: driver.aadharCardNumber || '',
+                aadharCardNumber: driver.aadharCardNumber || 'Not Available',
                 id: driver._id,
               })),
             };
@@ -747,6 +857,7 @@ export class CarrierLayoutComponent {
             this.showForm = false;
             this.showModal = false;
             this.showVehicleForm = false;
+            this.showCompanyForm = false;
           },
           error: (err) => {
             console.error('Failed to fetch customers:', err);
@@ -787,6 +898,7 @@ export class CarrierLayoutComponent {
             this.showForm = false;
             this.showModal = false;
             this.showVehicleForm = false;
+            this.showCompanyForm = false;
           },
           error: (err) => {
             console.error('Failed to fetch trucks:', err);
@@ -812,6 +924,7 @@ export class CarrierLayoutComponent {
             this.selectedComponent = component;
             this.showForm = false;
             this.showModal = false;
+            this.showCompanyForm = false;
           })
         )
         .subscribe({
@@ -843,10 +956,72 @@ export class CarrierLayoutComponent {
     if ('type' in action) {
       // This handles the case when `action` is of type { type: string; data: string }
       if (action.type === 'Bid') {
-        this.carrierService.getLoadInfo(action.data).subscribe((data) => {
-          this.openBidModal(data);
-        });
+        this.carrierService
+          .getShipperInfo(this.carrierRefId)
+          .subscribe((data) => {
+            if (data.success) {
+              const bankInfo = data.user.bankDetails;
+
+              // Check if all required bank details are present
+              if (
+                bankInfo &&
+                bankInfo.accountNumber &&
+                bankInfo.ifscCode &&
+                bankInfo.bankName
+              ) {
+                // Proceed to get load information and open the bid modal
+                this.carrierService
+                  .getLoadInfo(action.data)
+                  .subscribe((loadData) => {
+                    this.openBidModal(loadData);
+                  });
+              } else {
+                // Show toast if bank details are incomplete
+                this.toastr.error(
+                  'Please add your bank details before making a bid.',
+                  'Error'
+                );
+              }
+            } else {
+              // Handle the case where the shipper info is not found or error occurs
+              this.toastr.error('Failed to fetch shipper info.', 'Error');
+            }
+          });
       }
+      if (action.type === 'BidAgain') {
+        this.carrierService
+          .getShipperInfo(this.carrierRefId)
+          .subscribe((data) => {
+            if (data.success) {
+              const bankInfo = data.user.bankDetails;
+
+              // Check if all required bank details are present
+              if (
+                bankInfo &&
+                bankInfo.accountNumber &&
+                bankInfo.ifscCode &&
+                bankInfo.bankName
+              ) {
+                // Proceed to get load information and open the bid modal
+                this.carrierService
+                  .getLoadInfo(action.data)
+                  .subscribe((loadData) => {
+                    this.openBidModal(loadData);
+                  });
+              } else {
+                // Show toast if bank details are incomplete
+                this.toastr.error(
+                  'Please add your bank details before making a bid.',
+                  'Error'
+                );
+              }
+            } else {
+              // Handle the case where the shipper info is not found or error occurs
+              this.toastr.error('Failed to fetch shipper info.', 'Error');
+            }
+          });
+      }
+
       if (
         (action.type === 'edit' || action.type === 'view') &&
         item !== 'Trucks'
@@ -950,8 +1125,8 @@ export class CarrierLayoutComponent {
                   driversLicenseExpiry: formatDate(
                     user.driversLicenseExpiry || ''
                   ),
-                  aadharCardNumber: user.aadharCardNumber || '',
-                  dateOfBirth: formatDate(user.dateOfBirth || ''),
+                  aadharCardNumber: user.aadharCardNumber || 'Not Available',
+                  dateOfBirth: formatDate(user.dateOfBirth || 'Not Available'),
                   ifscCode: user.ifscCode || '',
                   accountNumber: user.accountNumber || '',
                   bankName: user.bankName || 'Bank',
@@ -1011,6 +1186,7 @@ export class CarrierLayoutComponent {
                   PolicyNumber: truck.PolicyNumber || '',
                   companyRefId: truck.companyRefId || '',
                   workStatus: truck.workStatus,
+                  isActive: truck.isActive,
                   _id: truck._id,
                 });
               }
@@ -1092,7 +1268,13 @@ export class CarrierLayoutComponent {
     }
 
     this.dataService.data$.subscribe((receivedData) => {
+      console.log(receivedData);
+
       if (receivedData === 'Customers') {
+        this.onSidebarButtonClick(receivedData);
+        console.log(receivedData);
+      }
+      if (receivedData === 'Shipments') {
         this.onSidebarButtonClick(receivedData);
         console.log(receivedData);
       }
@@ -1173,5 +1355,16 @@ export class CarrierLayoutComponent {
   }
   closeDeleteModal() {
     this.showDeleteModal = false;
+  }
+  getReadableDate(isoDate: string): string {
+    const date = new Date(isoDate);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
   }
 }

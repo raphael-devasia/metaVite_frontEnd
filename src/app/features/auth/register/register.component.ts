@@ -29,6 +29,8 @@ import { PasswordComponent } from './password/password.component';
 import { AuthService } from '../services/auth.service';
 import { take } from 'rxjs';
 import { AppAdminComponent } from './app-admin/app-admin.component';
+import { RegisterSuccessComponent } from './register-success/register-success.component';
+import { RegisterFailureComponent } from './register-failure/register-failure.component';
 
 @Component({
   selector: 'app-register',
@@ -42,6 +44,8 @@ import { AppAdminComponent } from './app-admin/app-admin.component';
     AddressComponent,
     PasswordComponent,
     AppAdminComponent,
+    RegisterSuccessComponent,
+    RegisterFailureComponent
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
@@ -178,11 +182,24 @@ export class RegisterComponent implements OnInit {
     this.registrationStatus = false;
   }
   navigateToLogin(role: string) {
-    this.router.navigate([`/${role}`]);
-  }
+    if (this.endUser_role === 'admin') {
+      this.router.navigate([`/${role}`]);
+    } else if (role === 'carrierAdmin') {
+      this.router.navigate([`/carrier`]);
+    } else if (role === 'shipperAdmin') {
+      this.router.navigate([`/shipper`]);
+    } else if (role === 'driver') {
+       this.router.navigate([`/carrier/driver`]);
+    }
+    }
+   
   handleButtonStatus(event: any) {
-    if (event) {
+    if (event===true) {
       this.buttonStatus.emit(true);
+    }else{
+      console.log('button status reaching here');
+       this.buttonStatus.emit(false);
+      
     }
   }
   onSubmit() {
@@ -194,9 +211,23 @@ export class RegisterComponent implements OnInit {
             console.log('User registered successfully:', response);
             this.deleteLocalStorageItems()
             this.isCompleted = true;
-            this.registrationStatus = response.success;
-            this.registrationMessage = response.message;
+            
             this.firstName = response.firstName;
+            if(response.success){
+              console.log('success activated');
+              this.registrationStatus = response.success;
+              this.registrationMessage = response.message;
+            }
+             if (!response.success) {
+              console.log('error activated');
+              
+               this.registrationStatus = false;
+               this.registrationMessage = response.message;
+
+               console.log('the end user is ',this.endUser_role);
+               console.log('registrationStatus', this.registrationStatus);
+               
+             }
           },
           (error) => {
             console.error('Error registering user:', error);
@@ -238,6 +269,13 @@ export class RegisterComponent implements OnInit {
       this.fields = [
         { endUser: 'shipperAdmin', text: 'COMPANY' },
         { endUser: 'shipperStaff', text: 'STAFF' },
+      ];
+    } else if (url.includes('/carrier/driver/register')) {
+      this.company = 'carrier';
+      this.endUser_role = 'driver';
+      this.fields = [
+        { endUser: 'carrierAdmin', text: 'COMPANY' },
+        { endUser: 'driver', text: 'DRIVER' },
       ];
     } else if (url.includes('/carrier/register')) {
       this.company = 'carrier';

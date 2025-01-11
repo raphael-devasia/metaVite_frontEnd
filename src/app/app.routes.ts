@@ -20,27 +20,23 @@ import { adminGuard } from './guards/admin.guard';
 import { driverGuard } from './guards/driver.guard';
 import { DashboardComponent } from './shared/components/dashboard/dashboard.component';
 import { InvoiceComponent } from './shared/components/invoice/invoice.component';
+import { RegisterFailureComponent } from './features/auth/register/register-failure/register-failure.component';
+import { RegisterSuccessComponent } from './features/auth/register/register-success/register-success.component';
 
 export const routes: Routes = [
-  { path: 'test', component: ChatComponent },
-  { path: 'shipper', component: LoginComponent },
-
-  { path: 'carrier', component: LoginComponent },
-
+  // route for user logins-
   { path: 'admin', component: LoginComponent },
+  { path: 'shipper', component: LoginComponent },
+  { path: 'carrier', component: LoginComponent },
   { path: 'carrier/driver', component: LoginComponent },
+
+  // Route for user registration
+  { path: 'admin/register', component: RegisterComponent },
   { path: 'shipper/register', component: RegisterComponent },
   { path: 'carrier/register', component: RegisterComponent },
-  { path: 'admin/register', component: RegisterComponent },
-  { path: 'dashboard', component: InvoiceComponent },
+  { path: 'carrier/driver/register', component: RegisterComponent },
 
-  { path: 'loads', component: LoadFormComponent },
-  {
-    path: 'carrier/driver/dashboard',
-    component: DriverLayoutComponent,
-    canActivate: [driverGuard],
-  },
-
+  // Routes for user dashboards
   {
     path: 'admin/dashboard',
     component: AdminLayoutComponent,
@@ -52,10 +48,21 @@ export const routes: Routes = [
     canActivate: [shipperGuard],
   },
   {
+    path: 'carrier/driver/dashboard',
+    component: DriverLayoutComponent,
+    canActivate: [driverGuard],
+  },
+
+  {
     path: 'carrier/admin/dashboard',
     component: CarrierLayoutComponent,
     canActivate: [carrierGuard],
   },
 
   { path: '', component: HomePageComponent },
+
+  // routes need to be deleted (for testing purpose)
+  { path: 'test', component: VehicleFormComponent },
+  { path: 'dashboard', component: InvoiceComponent },
+  { path: 'loads', component: LoadFormComponent },
 ];

@@ -8,6 +8,7 @@ import {
   Input,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { InvitationFormComponent } from '../invitation-form/invitation-form.component';
@@ -29,6 +30,9 @@ import { RazorpayService } from '../../../core/services/razorpay.service';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { BidpriceSocketService } from '../../../core/services/user/bidprice-socket.service';
 import { InvoiceComponent } from '../invoice/invoice.component';
+import { ToastrService } from 'ngx-toastr';
+import { DeleteModalComponent } from '../delete-modal/delete-modal.component';
+import { TrackerComponent } from '../tracker/tracker.component';
 
 @Component({
   selector: 'app-table',
@@ -41,6 +45,8 @@ import { InvoiceComponent } from '../invoice/invoice.component';
     MatIconModule,
     NgClass,
     FormsModule,
+    DeleteModalComponent,
+    TrackerComponent,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.css',
@@ -52,6 +58,9 @@ export class TableComponent implements OnInit {
   id: string = '';
   showTable: boolean = false;
   filteredData: any;
+  showDeleteModal: boolean = false;
+  target!: string;
+  targetId!: string;
   @Input() tabledata: {
     title: string;
     button: string;
@@ -94,15 +103,25 @@ export class TableComponent implements OnInit {
   itemsPerPage = 10; // Number of items per page
   currentPage = 1; // Current page
   searchQuery: string = '';
+  showNoContentMessage!: boolean;
   private originalTableData: any[] = [];
   private bidSubscription!: Subscription;
 
   activeStatus: string = 'Active';
   setActiveStatus(status: string) {
     this.activeStatus = status;
+    // const filteredData =
+    //   this.tabledata.paginatedData?.filter((item) => item.status === status) ||
+    //   [];
+    // if (filteredData.length === 0) {
+    //   this.showNoContentMessage = true;
+    // } else {
+    //   this.showNoContentMessage = false;
+    // }
   }
   constructor(
     public dialog: MatDialog,
+    private toastr: ToastrService,
     @Inject(DataService) private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
@@ -165,7 +184,7 @@ export class TableComponent implements OnInit {
       dataToPass = { heading: 'Add Truck' };
 
       const dialogRef = this.dialog.open(VehicleFormComponent, {
-        maxWidth: '1000px',
+        minWidth: '800px',
         maxHeight: '100vh',
         data: dataToPass,
         panelClass: 'custom-dialog-container',
@@ -185,6 +204,7 @@ export class TableComponent implements OnInit {
   }
   ngOnInit(): void {
     const currentUrl = this.router.url;
+    console.log(this.tabledata);
 
     if (currentUrl.includes('/carrier/admin/dashboard')) {
       this.user = this.localStorageServices.getCarrierAdminData();
@@ -201,9 +221,67 @@ export class TableComponent implements OnInit {
     console.log('the data is ', this.getProcessedTableData());
     console.log(this.tabledata);
     this.originalTableData = [...this.tabledata.tableData];
+
+    this.updatePaginatedData();
+    // if (this.tabledata?.statuses.length > 0) {
+    //   this.setActiveStatus(this.tabledata?.statuses[0]);
+    // }
+    if (this.tabledata?.statuses.length === 0) {
+      this.showNoContentMessage = true;
+    }
+    this.setActiveStatus(this.tabledata.statuses[0]);
+    //  const filteredData =
+    //    this.tabledata.paginatedData?.filter((item) => item.status === this.tabledata?.statuses[0]) || [];
+    //  if (filteredData.length === 0) {
+    //    this.showNoContentMessage = true;
+    //  } else {
+    //    this.showNoContentMessage = false;
+    //  }
+
+    this.establishSocketConnection();
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['tabledata'] && changes['tabledata'].currentValue) {
+      console.log('tabledata changed', changes['tabledata'].currentValue);
+      this.originalTableData = [...this.tabledata.tableData];
+      this.updatePaginatedData();
+      if (this.tabledata?.statuses.length === 0) {
+        this.showNoContentMessage = true;
+      } else {
+        this.showNoContentMessage = false;
+      }
+    }
+  }
+  // Update the data to display based on current page
+  updatePaginatedData(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.tabledata.paginatedData = this.tabledata.tableData
+      .reverse()
+      .slice(startIndex, endIndex);
+    console.log('Paginated data:', this.tabledata.paginatedData);
+  }
+
+  // Navigate to the next page
+  goToNextPage(): void {
+    if (
+      this.currentPage * this.itemsPerPage <
+      this.tabledata.tableData.length
+    ) {
+      this.currentPage++;
+      this.updatePaginatedData();
+    }
+  }
+  establishSocketConnection(): void {
     this.bidSubscription = this.bidpriceSocketService.lowestBid$.subscribe(
       (newBid: any) => {
         console.log('Received updated bid:', newBid);
+        if (!newBid) {
+          console.log(
+            'No new bid data received, table data remains unchanged.'
+          );
+          return;
+        }
         if (
           this.tabledata.title === 'All Bids' ||
           this.tabledata.title === 'All Loads' ||
@@ -231,27 +309,6 @@ export class TableComponent implements OnInit {
         }
       }
     );
-    this.updatePaginatedData();
-  }
-  // Update the data to display based on current page
-  updatePaginatedData(): void {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.tabledata.paginatedData = this.tabledata.tableData
-      .reverse()
-      .slice(startIndex, endIndex);
-    console.log('Paginated data:', this.tabledata.paginatedData);
-  }
-
-  // Navigate to the next page
-  goToNextPage(): void {
-    if (
-      this.currentPage * this.itemsPerPage <
-      this.tabledata.tableData.length
-    ) {
-      this.currentPage++;
-      this.updatePaginatedData();
-    }
   }
 
   // Navigate to the previous page
@@ -331,8 +388,10 @@ export class TableComponent implements OnInit {
   }
   openInvoiceModal(data: any) {
     const dialogRef = this.dialog.open(InvoiceComponent, {
-      width: '80%',
+      width: '90%', // Increased the width to 90%
+      height: '90vh', // Set a height to limit the dialog size
       data: data,
+      panelClass: 'custom-dialog-container',
     });
     dialogRef.afterClosed().subscribe((result) => {
       console.log('The dialog was closed', result);
@@ -340,6 +399,8 @@ export class TableComponent implements OnInit {
   }
 
   saveClient(clientData: any) {
+    console.log('save client initiated');
+
     console.log(this.user);
 
     if (this.user) {
@@ -352,6 +413,7 @@ export class TableComponent implements OnInit {
     this.closeClientModal();
   }
   savePickup(pickupData: any) {
+    console.log('save pickup initiated');
     console.log(this.user);
 
     if (this.user) {
@@ -413,6 +475,18 @@ export class TableComponent implements OnInit {
         row.expanded = !row.expanded;
         this.currentExpandedRow = row.expanded ? row : null;
       });
+    } else if (currentRoute === '/admin/dashboard') {
+      console.log(row._id);
+      this.UserServices.getLoadInfo(row._id).subscribe((data) => {
+        console.log(data.load);
+        this.showTable = true;
+        this.loadData = data.load;
+        if (this.currentExpandedRow && this.currentExpandedRow !== row) {
+          this.currentExpandedRow.expanded = false;
+        }
+        row.expanded = !row.expanded;
+        this.currentExpandedRow = row.expanded ? row : null;
+      });
     } else {
       console.log(row._id);
       this.ShipperServices.getLoadInfo(row._id).subscribe((data) => {
@@ -435,17 +509,27 @@ export class TableComponent implements OnInit {
     const action = { type: 'Bid', data: data._id };
     this.dataService.sendData(action);
   }
+  makeBidAgain(data: any) {
+    
+    
+    const action = { type: 'BidAgain', data: data._id };
+    this.dataService.sendData(action);
+  }
   getPayment(data: any) {
     console.log(data);
     const currentUrl = this.router.url;
     if (currentUrl.includes('/carrier/admin/dashboard')) {
       this.CarrierServices.getPayment(data.id).subscribe((result) => {
         console.log(result);
-        
+
         this.openInvoiceModal(result.payments);
       });
     } else if (currentUrl.includes('/shipper/admin/dashboard')) {
       this.ShipperServices.getPayment(data.id).subscribe((result) => {
+        this.openInvoiceModal(result.payments);
+      });
+    } else if (currentUrl.includes('/admin/dashboard')) {
+      this.UserServices.getPayment(data.id).subscribe((result) => {
         this.openInvoiceModal(result.payments);
       });
     }
@@ -569,8 +653,103 @@ export class TableComponent implements OnInit {
     }
   }
 
-  cancelShipment() {}
-  updateStatus() {}
+  cancelShipment(id: string) {
+    this.targetId = id;
+    this.target = 'Cancelled';
+    this.showDeleteModal = true;
+    // this.CarrierServices.updateLoadInfo(id, 'Cancelled').subscribe((result) => {
+    //   if (result.success) {
+    //     console.log();
+    //   }
+    // });
+  }
+  deleteResource(id: string, target: string) {
+    console.log(id, target);
+    if (this.user.role === 'carrierAdmin') {
+      this.CarrierServices.updateLoadInfo(id, { id: target }).subscribe({
+        next: (data: any) => {
+          if (data.success) {
+            this.toastr.success('Shipment cancelled successfully!', 'Success');
+            this.dataService.sendData('Shipments');
+          } else {
+            this.toastr.error(data.message, 'Error');
+          }
+        },
+        error: (err) => {
+          console.error('Error cancelling shipment:', err);
+          this.toastr.error(
+            'Failed to cancel shipment. Please try again.',
+            'Error'
+          );
+        },
+      });
+    }
+    if (this.user.role === 'shipperAdmin') {
+      this.ShipperServices.updateLoadInfo(id, { id: target }).subscribe({
+        next: (data: any) => {
+          if (data.success) {
+            this.toastr.success('Shipment cancelled successfully!', 'Success');
+            this.dataService.sendData('Shipments');
+          } else {
+            this.toastr.error(data.message, 'Error');
+          }
+        },
+        error: (err) => {
+          console.error('Error cancelling shipment:', err);
+          this.toastr.error(
+            'Failed to cancel shipment. Please try again.',
+            'Error'
+          );
+        },
+      });
+    }
+  }
+
+  updateStatus(id: string, status: string) {
+    console.log('button clicked');
+
+    if (this.user.role === 'driver') {
+      this.DriverServices.updateLoadInfo(id, { id: status }).subscribe({
+        next: (data: any) => {
+          if (data.success) {
+            this.toastr.success('Shipment updated successfully!', 'Success');
+            this.dataService.sendData('Shipments');
+          } else {
+            this.toastr.error(data.message, 'Error');
+          }
+        },
+        error: (err) => {
+          console.error('Error updating shipment:', err);
+          this.toastr.error(
+            'Failed to update shipment. Please try again.',
+            'Error'
+          );
+        },
+      });
+    }
+    if (this.user.role === 'shipperAdmin') {
+      this.ShipperServices.updateLoadInfo(id, { id: status }).subscribe({
+        next: (data: any) => {
+          if (data.success) {
+            this.toastr.success('Shipment updated successfully!', 'Success');
+            this.dataService.sendData('Shipments');
+          } else {
+            this.toastr.error(data.message, 'Error');
+          }
+        },
+        error: (err) => {
+          console.error('Error updating shipment:', err);
+          this.toastr.error(
+            'Failed to update shipment. Please try again.',
+            'Error'
+          );
+        },
+      });
+    }
+  }
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+  }
   updateStatusToDelivered() {}
   shouldShowRow(row: any): boolean {
     // Normalize statuses for comparison
@@ -580,11 +759,36 @@ export class TableComponent implements OnInit {
     if (!rowStatus) {
       return true;
     }
+    console.log('the row status is ', rowStatus);
+    console.log('the active status is ', activeStatus);
 
     // Handle 'Active' status group (e.g., Assigned, Dispatched, Delivered, Open)
     if (activeStatus === 'active') {
       // Show rows with 'Assigned' or 'Open' status when activeStatus is 'Active'
       return rowStatus === 'assigned' || rowStatus === 'open';
+    }
+    if (activeStatus === 'assigned') {
+      // Show rows with 'Assigned' or 'Open' status when activeStatus is 'Active'
+      return rowStatus === 'picked' || rowStatus === 'assigned';
+    }
+    if (activeStatus === 'dispatched') {
+      // Show rows with 'Assigned' or 'Open' status when activeStatus is 'Active'
+      return (
+        rowStatus === 'picked' ||
+        rowStatus === 'delivered1' ||
+        rowStatus === 'delivered2' ||
+        rowStatus === 'delivered3' ||
+        rowStatus === 'delivered' ||
+        rowStatus === 'delivered1-partial' ||
+        rowStatus === 'delivered2-partial' ||
+        rowStatus === 'delivered3-partial' ||
+        rowStatus === 'dispatched'
+      );
+    }
+
+    if (activeStatus === 'delivered') {
+      // Show rows with 'Assigned' or 'Open' status when activeStatus is 'Active'
+      return rowStatus === 'completed';
     }
 
     // Handle 'Open/Closed' status group
@@ -596,5 +800,110 @@ export class TableComponent implements OnInit {
     const isMatch = rowStatus === activeStatus;
 
     return isMatch;
+  }
+  getDriverActions(
+    loadData: any
+  ): { label: string; nextStatus: string; class: string }[] {
+    const actions: any = [];
+    if (!loadData) return actions;
+
+    const { status, dropoffs } = loadData;
+
+    const buttonClass =
+      'bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded';
+
+    if (status === 'Dispatched' && dropoffs === 1) {
+      actions.push({
+        label: 'Confirm Delivery',
+        nextStatus: 'Delivered',
+        class: buttonClass,
+      });
+    } else if (status === 'Dispatched' && dropoffs > 1) {
+      actions.push({
+        label: `Confirm Delivery 1`,
+        nextStatus: 'Delivered1-Partial',
+        class: buttonClass,
+      });
+    } else if (status === 'Delivered1' && dropoffs === 2) {
+      actions.push({
+        label: `Complete Delivery`,
+        nextStatus: 'Delivered',
+        class: buttonClass,
+      });
+    } else if (status === 'Delivered1' && dropoffs === 3) {
+      actions.push({
+        label: `Confirm Delivery 2`,
+        nextStatus: 'Delivered2-Partial',
+        class: buttonClass,
+      });
+    } else if (status === 'Delivered2' && dropoffs === 3) {
+      actions.push({
+        label: `Complete Delivery`,
+        nextStatus: 'Delivered',
+        class: buttonClass,
+      });
+    }
+
+    return actions;
+  }
+
+  getShipperAction(
+    loadData: any
+  ): { label: string; nextStatus: string; class: string } | null {
+    if (!loadData) return null;
+
+    const { status, dropoffs } = loadData;
+
+    const buttonClass =
+      'bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded';
+
+    if (status === 'Delivered' && dropoffs === 1) {
+      return {
+        label: 'Complete Delivery',
+        nextStatus: 'Completed',
+        class: buttonClass,
+      };
+    } else if (status === 'Delivered1-Partial' || status === 'Delivered1') {
+      return {
+        label: 'Confirm Delivery 1',
+        nextStatus: 'Delivered1',
+        class: buttonClass,
+      };
+    } else if (status === 'Delivered2-Partial') {
+      return {
+        label: 'Confirm Delivery 2',
+        nextStatus: 'Delivered2',
+        class: buttonClass,
+      };
+    } else if (status === 'Delivered' && dropoffs > 1) {
+      return {
+        label: 'Complete Delivery',
+        nextStatus: 'Completed',
+        class: buttonClass,
+      };
+    }
+
+    return null;
+  }
+
+  isWaitingForDelivery(loadData: any): boolean {
+    if (!loadData) return false;
+
+    const waitingStatuses = [
+      'Dispatched',
+      'Delivered1-Partial',
+      'Delivered2-Partial',
+    ];
+    return waitingStatuses.includes(loadData.status);
+  }
+
+  getDeliveryStep(status: string): string {
+    const statusMapping: { [key: string]: string } = {
+      Dispatched: '1',
+      'Delivered1-Partial': '2',
+      'Delivered2-Partial': '3',
+    };
+
+    return statusMapping[status] || '';
   }
 }

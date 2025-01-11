@@ -25,9 +25,34 @@ export class AppAdminComponent implements OnInit {
   constructor(private fb: FormBuilder, private authService: AuthService) {
     this.formGroup = this.fb.group(
       {
-        firstName: ['', Validators.required],
-        lastName: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
+        firstName: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(2),
+            Validators.maxLength(50),
+            Validators.pattern(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/),
+          ],
+        ],
+        lastName: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(2),
+            Validators.maxLength(50),
+            Validators.pattern(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/),
+          ],
+        ],
+        email: [
+          '',
+          [
+            Validators.required,
+            Validators.email,
+            Validators.pattern(
+              /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+            ),
+          ],
+        ],
         password: [
           '',
           [
@@ -47,28 +72,35 @@ export class AppAdminComponent implements OnInit {
   ngOnInit(): void {
     this.submitEvent.subscribe(() => this.onsubmit());
     this.formGroup.statusChanges.subscribe((status) => {
-      if(this.formGroup.valid)
-      this.formStatusEvent.emit(this.formGroup.valid);
+      if (this.formGroup.valid) this.formStatusEvent.emit(this.formGroup.valid);
     });
   }
 
   passwordMatchValidator(formGroup: FormGroup) {
     const password = formGroup.get('password');
     const confirmPassword = formGroup.get('confirm_password');
+
     if (password && confirmPassword) {
       if (password.value !== confirmPassword.value) {
         confirmPassword.setErrors({ mustMatch: true });
       } else {
-        confirmPassword.setErrors(null);
+        // Only clear the mustMatch error
+        const currentErrors = confirmPassword.errors;
+        if (currentErrors) {
+          delete currentErrors.mustMatch;
+          confirmPassword.setErrors(
+            Object.keys(currentErrors).length ? currentErrors : null
+          );
+        }
       }
     }
   }
 
   onsubmit() {
-    if (this.formGroup.invalid || this.isSubmitting){
-       return 
-      } 
-       this.isSubmitting = true;
+    if (this.formGroup.invalid || this.isSubmitting) {
+      return;
+    }
+    this.isSubmitting = true;
 
     const formValues = this.formGroup.value;
 
@@ -116,10 +148,52 @@ export class AppAdminComponent implements OnInit {
         this.isSubmitting = false;
       },
       (error) => {
-        console.error('Error registering user:', error.error.message);
+        console.error('Error registering user:', error);
         this.messageEvent.emit(error.error);
-        this.isSubmitting = false ;
+        this.isSubmitting = false;
       }
     );
+  }
+
+  getErrorMessage(controlName: string): string {
+    const control = this.formGroup.get(controlName);
+    if (!control) return '';
+
+    if (controlName === 'confirm_password' && control.hasError('mustMatch')) {
+      return 'Passwords must match';
+    }
+
+    if (control.hasError('required')) {
+      return `${controlName.replace(/([A-Z])/g, ' $1').trim()} is required`;
+    }
+
+    if (control.hasError('email')) {
+      return 'Please enter a valid email address';
+    }
+
+    if (control.hasError('pattern')) {
+      switch (controlName) {
+        case 'firstName':
+        case 'lastName':
+          return 'Please enter valid letters only';
+        case 'email':
+          return 'Please enter a valid email address';
+        case 'password':
+          return 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
+      }
+    }
+
+    if (control.hasError('minlength')) {
+      if (controlName === 'password') {
+        return `Password must be at least ${control.errors?.['minlength'].requiredLength} characters`;
+      }
+      return `${controlName
+        .replace(/([A-Z])/g, ' $1')
+        .trim()} must be at least ${
+        control.errors?.['minlength'].requiredLength
+      } characters`;
+    }
+
+    return '';
   }
 }

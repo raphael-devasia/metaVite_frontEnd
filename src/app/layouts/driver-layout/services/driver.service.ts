@@ -7,7 +7,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class DriverService {
-  private baseUrl = 'http://localhost:4000/';
+  // private baseUrl = 'http://localhost:4000/';
+  private baseUrl = 'http://a4624d01d367b4e51ae51cbe6f066c92-452922102.eu-north-1.elb.amazonaws.com:4000/';
   http = inject(HttpClient);
   constructor() {}
   getDriver(userId: string): Observable<any> {
@@ -37,6 +38,14 @@ export class DriverService {
   getLoadInfo(userId: string): Observable<any> {
     return this.http.get(
       `${this.baseUrl}carrier/staff-driver/load-info/${userId}`
+    );
+  }
+  updateLoadInfo(userId: string, bidId: any): Observable<any> {
+    console.log(bidId);
+
+    return this.http.post(
+      `${this.baseUrl}carrier/staff-driver/update-load-info/${userId}`,
+      bidId
     );
   }
 }

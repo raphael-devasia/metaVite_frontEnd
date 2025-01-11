@@ -13,6 +13,7 @@ import { CustomValidators } from '../../customValidators';
 import { MatDialogRef } from '@angular/material/dialog';
 import { LocalstorageService } from '../../../core/services/localstorage.service';
 import { ToastrService } from 'ngx-toastr';
+import { DataService } from '../../services/data.service';
 
 @Component({
   selector: 'app-load-form',
@@ -28,6 +29,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class LoadFormComponent implements OnInit {
   ShipperServices = inject(ShipperService);
+  dataServices = inject(DataService);
   
   form: FormGroup;
   message: string | null = null; // To store success/error message
@@ -42,6 +44,7 @@ export class LoadFormComponent implements OnInit {
   dropOffs = [1, 2, 3];
   showClientModal = false;
   showPickupModal = false;
+  errorMessages!:any
   userId: string = '';
   modalHeading = 'Add A Client';
   vehicleTypes = [
@@ -71,8 +74,20 @@ export class LoadFormComponent implements OnInit {
         client3: [''],
         appointment3: [''],
         pickupLocation: [''],
-        material: ['', Validators.required],
-        quantity: ['', [Validators.required, CustomValidators.quantityInTons]],
+        // material: ['', Validators.required],
+        // quantity: ['', [Validators.required, CustomValidators.quantityInTons]],
+        material: [
+          '',
+          [
+            Validators.required,
+            Validators.pattern('^[A-Z]+( [A-Z]+)*$'), // Minimum 3 letters, uppercase only, and spaces allowed
+            Validators.minLength(3),
+          ],
+        ],
+        quantity: [
+          '',
+          [Validators.required, Validators.min(1), Validators.max(100)],
+        ],
         vehicleBody: ['open', Validators.required],
         vehicleType: ['', Validators.required],
         mhcvSubtype: [''],
@@ -91,7 +106,7 @@ export class LoadFormComponent implements OnInit {
         ],
         dispatchDateTime: [
           '',
-          [Validators.required, CustomValidators.futureDate],
+          [Validators.required, CustomValidators.atLeast24HoursFromNow],
         ],
         expectedDelivery: [
           '',
@@ -107,6 +122,34 @@ export class LoadFormComponent implements OnInit {
         ],
       }
     );
+
+    // Error messages
+    this.errorMessages = {
+      material: {
+        required: 'Material is required.',
+        pattern: 'Only uppercase letters and spaces are allowed.',
+        minLength: 'Material must be at least 3 characters long.',
+      },
+      quantity: {
+        required: 'Quantity is required.',
+        min: 'Quantity must be at least 1 ton.',
+        max: 'Quantity cannot exceed 100 tons.',
+      },
+      trailerFeet: {
+        invalid: 'Invalid trailer feet value.',
+      },
+      tipperLoad: {
+        invalid: 'Invalid tipper load value.',
+      },
+      mixerCapacity: {
+        invalid: 'Invalid mixer capacity value.',
+      },
+      dispatchDateTime: {
+        required: 'Dispatch date and time is required.',
+        atLeast24HoursFromNow:
+          'Dispatch must be scheduled at least 24 hours from now.',
+      },
+    };
   }
 
   ngOnInit(): void {
@@ -302,23 +345,27 @@ export class LoadFormComponent implements OnInit {
           this.message = result.message;
           this.messageType = 'success';
           this.cdr.detectChanges();
+           this.toastr.success(result.message, 'Success');
+           this.dataServices.sendData('All Bids');
           setTimeout(() => {
-            this.form.reset();
-            this.message = null; // Clear message
-            this.messageType = null; // Clear message type
+            // this.form.reset();
+            // this.message = null; // Clear message
+            // this.messageType = null; // Clear message type
+             this.dialogRef.close();
             // this.onCancel();
-          }, 3000); // 3 seconds delay
+          }, 2000); // 3 seconds delay
         } else {
-          this.message = result.message;
-          this.messageType = 'error';
-          setTimeout(() => {
-            this.message = null; // Clear message
-            this.messageType = null; // Clear message type
-          }, 3000); // 3 seconds delay
+          this.toastr.error(result.message, 'Error');
+          // this.message = result.message;
+          // this.messageType = 'error';
+          // setTimeout(() => {
+          //   this.message = null; // Clear message
+          //   this.messageType = null; // Clear message type
+          // }, 3000); 
         }
       });
     } else {
-      console.log('Form is invalid');
+     this.toastr.error('Form Is Invalid', 'Error');
     }
   }
 
@@ -393,4 +440,12 @@ export class LoadFormComponent implements OnInit {
     this.updateClientOptions();
     this.closePickupModal();
   }
+
+
+
+
+
+
+
+  
 }

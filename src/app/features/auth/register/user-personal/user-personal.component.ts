@@ -36,10 +36,51 @@ export class UserPersonalComponent implements OnInit {
     private store: Store<UserRegistrationState>
   ) {
     this.formGroup = this.fb.group({
-      firstName: ['', [Validators.required, Validators.minLength(3)]],
-      lastName: ['', [Validators.required, Validators.minLength(3)]],
-      emergencyContactName: [''],
-      emergencyContactNumber: ['', [Validators.pattern(/^[6-9]\d{9}$/)]],
+      firstName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(50),
+          Validators.pattern(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/),
+          // Allows letters, spaces, dots, apostrophes, hyphens
+          // Must start with letter
+        ],
+      ],
+
+      lastName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(50),
+          Validators.pattern(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/),
+          // Same pattern as firstName
+        ],
+      ],
+
+      emergencyContactName: [
+        '',
+        [
+          Validators.minLength(3),
+          Validators.maxLength(100),
+          Validators.pattern(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/),
+          // Optional but if provided, must follow name format
+        ],
+      ],
+
+      emergencyContactNumber: [
+        '',
+        [
+          Validators.pattern(
+            /^(?:(?:\+|0{0,2})91(\s*[-]\s*)?|[0]?)?[6789]\d{9}$/
+          ),
+          // Indian phone number validation
+          // Optional +91 prefix
+          // Must start with 6, 7, 8, or 9
+          // Total 10 digits after prefix
+        ],
+      ],
     });
   }
 
@@ -68,12 +109,13 @@ export class UserPersonalComponent implements OnInit {
       }
     });
 
-     this.formGroup.statusChanges.subscribe((status) => {
-       if (status === 'VALID') {
-         this.buttonActivate.emit(true);
-       }
-     });
-
+    this.formGroup.statusChanges.subscribe((status) => {
+      if (status === 'VALID') {
+        this.buttonActivate.emit(true); // Emit true if form is valid
+      } else {
+        this.buttonActivate.emit(false); // Emit false if form is not valid
+      }
+    });
 
     this.submitEvent.subscribe(() => this.onSubmit());
   }
@@ -98,7 +140,7 @@ export class UserPersonalComponent implements OnInit {
             lastName: formValues.lastName,
           },
         };
-        
+
         this.store.dispatch(updateUser({ user: updatedUser }));
         console.log('Personal Details Updated:', updatedUser);
       } else {
@@ -118,5 +160,35 @@ export class UserPersonalComponent implements OnInit {
         console.log('Personal Details Updated:', updatedUser);
       }
     });
+  }
+  // Helper method for error messages
+  getErrorMessage(controlName: string): string {
+    const control = this.formGroup.get(controlName);
+    if (!control) return '';
+
+    if (control.hasError('required')) {
+      return `${controlName.replace(/([A-Z])/g, ' $1').trim()} is required`;
+    }
+
+    if (control.hasError('minlength')) {
+      return `${controlName
+        .replace(/([A-Z])/g, ' $1')
+        .trim()} must be at least ${
+        control.errors?.['minlength'].requiredLength
+      } characters`;
+    }
+
+    if (control.hasError('pattern')) {
+      switch (controlName) {
+        case 'firstName':
+        case 'lastName':
+        case 'emergencyContactName':
+          return 'Please enter valid letters only (spaces and hyphens allowed)';
+        case 'emergencyContactNumber':
+          return 'Please enter a valid Indian phone number (e.g., +91 9876543210)';
+      }
+    }
+
+    return '';
   }
 }

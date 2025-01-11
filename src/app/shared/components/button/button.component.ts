@@ -21,8 +21,10 @@ export class ButtonComponent implements OnInit{
     this.buttonStatus.subscribe((data)=>{
      console.log(data);
      
-      if(data){
+      if(data===true){
         this.isButtonActive=true
+      }else{
+        this.isButtonActive = false;
       }
     })
   }

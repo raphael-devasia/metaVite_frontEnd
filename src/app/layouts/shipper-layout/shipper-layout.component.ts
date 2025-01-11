@@ -97,7 +97,7 @@ export class ShipperLayoutComponent implements OnInit {
   targetId!: string;
   action!: string;
   lowestBid: number | null = null;
-  dashBoardData:any
+  dashBoardData: any;
 
   companyInformation: FormField[] = [
     {
@@ -224,21 +224,16 @@ export class ShipperLayoutComponent implements OnInit {
   });
 
   // UI Management
-  buttonTexts: string[] = [
-    'Dashboard',
-    'All Bids',
-    'Shipments',
-
-    'Customers',
-    'Pick-up Locations',
-    // 'Staffs',
-
-    'Payments',
-    // 'Notifications',
-    // 'Chats',
-    // 'Company Details',
-    'Log Out',
+  buttonTexts = [
+    { text: 'Dashboard', icon: 'dashboard' },
+    { text: 'All Bids', icon: 'gavel' },
+    { text: 'Shipments', icon: 'local_shipping' },
+    { text: 'Customers', icon: 'people' },
+    { text: 'Pick-up Locations', icon: 'location_on' },
+    { text: 'Payments', icon: 'payment' },
+    { text: 'Log Out', icon: 'logout' },
   ];
+
   bidTableData = {
     title: 'All Bids',
     button: 'Add New Load',
@@ -283,7 +278,7 @@ export class ShipperLayoutComponent implements OnInit {
       'Load ID',
       'Drop City',
       'Commodity',
-      'Carrier Name',
+      'Carrier ID',
       'Pickup Date',
 
       'Base Price',
@@ -377,20 +372,18 @@ export class ShipperLayoutComponent implements OnInit {
     statuses: [],
     tableHeads: [
       'Load Id',
-      'Destination City',
+      'Pick-Up City',
       'Carrier Name',
       'Carrier Ref_id',
       'Amount',
       'payment Status',
-      'Action'
-      
+      'Action',
     ],
     tableData: [],
   };
 
   onSidebarButtonClick(component: string) {
     if (component === 'All Bids') {
-      this.selectedComponent = component;
       this.UserServices.getAllShipperBids(this.shipperId)
         .pipe(
           tap((bids: any) => {
@@ -420,13 +413,18 @@ export class ShipperLayoutComponent implements OnInit {
         )
         .subscribe({
           next: () => {
+            console.log(this.bidTableData);
+            // Only update these after data is received
             this.selectedComponent = component;
             this.showForm = false;
             this.showModal = false;
           },
-          error: (err) => {},
+          error: (err) => {
+            console.error('Error fetching bids', err);
+          },
         });
     }
+
     if (component === 'Shipments') {
       this.selectedComponent = component;
       this.UserServices.getAllShipperBids(this.shipperId)
@@ -441,7 +439,17 @@ export class ShipperLayoutComponent implements OnInit {
               (bid: any) =>
                 bid.status === 'Assigned' ||
                 bid.status === 'Dispatched' ||
-                bid.status === 'Delivered'
+                bid.status === 'Delivered' ||
+                bid.status === 'Picked' ||
+                bid.status === 'Delivered1' ||
+                bid.status === 'Delivered2' ||
+                bid.status === 'Delivered3' ||
+                bid.status === 'Delivered' ||
+                bid.status === 'Delivered1-Partial' ||
+                bid.status === 'Delivered2-Partial' ||
+                bid.status === 'Delivered3-Partial' ||
+                bid.status === 'Delivered' ||
+                bid.status === 'Completed'
             );
             this.shipmentTableData = {
               ...this.shipmentTableData,
@@ -449,8 +457,8 @@ export class ShipperLayoutComponent implements OnInit {
                 loadId: bid.loadId || '',
                 dropCity: bid.dropoff1?.address?.city || '',
                 commodity: bid.material || 'Unknown', // Add logic for status if not in data
-                vehicleType: bid.vehicleBody || '',
-                trailerType: bid.vehicleType || '',
+                carrierId: bid.bidCarrier || '',
+                pickUpdate: this.getReadableDate(bid.dispatchDateTime) || '',
                 basePrice: bid.basePrice || '',
                 lowestBid: bid.lowestPrice || '--',
                 status: bid.status,
@@ -543,25 +551,24 @@ export class ShipperLayoutComponent implements OnInit {
         });
     }
     if (component === 'Payments') {
-      
       this.ShipperServices.getAllPayments()
         .pipe(
           tap((payments: any) => {
             // Populate driverTableData with the fetched drivers
-            
+
             // Filter payments by shipperId
             const filteredPayments = payments.payments.filter(
               (payment: any) => payment.shipperId === this.shipperId
             );
-            console.log(filteredPayments);
-            
+            console.log(filteredPayments[0]);
+
             this.paymentTableData = {
               ...this.paymentTableData,
               tableData: filteredPayments.map((payment: any) => ({
                 loadId: payment?.loadDetails?.loadId || '',
                 destinationCity:
-                  payment.loadDetails.dropoff1.address.city || '',
-                carrierName: payment.loadDetails.bidCarrier || '',
+                  payment?.loadDetails?.pickupLocation?.address?.city || '',
+                carrierName: payment?.loadDetails?.bidCarrier || '',
                 carrierRefId: payment.carrierId || '',
                 amount: payment.amount || '',
                 paymentStatus: payment.status || 'Unknown',
@@ -634,7 +641,7 @@ export class ShipperLayoutComponent implements OnInit {
         payments: this.ShipperServices.getAllPayments(),
       })
         .pipe(
-          tap(({ bids, clients, pickups ,payments}) => {
+          tap(({ bids, clients, pickups, payments }) => {
             // Handle Bids Data (Open and Closed Bids)
             if (bids && bids.bids) {
               const data = bids.bids;
@@ -748,12 +755,12 @@ export class ShipperLayoutComponent implements OnInit {
                 })),
               };
             }
-             if (payments) {
-             console.log(payments);
-             const data = payments.payments
-             this.dashBoardData = data.filter(
-               (payment: any) => payment.shipperId === this.shipperId
-             );
+            if (payments) {
+              console.log(payments);
+              const data = payments.payments;
+              this.dashBoardData = data.filter(
+                (payment: any) => payment.shipperId === this.shipperId
+              );
             }
 
             // Set selected component and hide modal/form
@@ -883,7 +890,16 @@ export class ShipperLayoutComponent implements OnInit {
       }
       if (receivedData === 'Dashboard') {
         this.onSidebarButtonClick(receivedData);
-      }else {
+      }
+      if (receivedData === 'All Bids') {
+        this.onSidebarButtonClick(receivedData);
+      }
+      if (receivedData === 'Pick-up Locations') {
+        this.onSidebarButtonClick(receivedData);
+      }
+      if (receivedData === 'Shipments') {
+        this.onSidebarButtonClick(receivedData);
+      } else {
         // this.handleAction(receivedData);
         console.log(receivedData);
         this.handleAction(receivedData);
@@ -893,7 +909,7 @@ export class ShipperLayoutComponent implements OnInit {
       this.chatUser = id;
       this.isChatActive = true;
     });
-    this.onSidebarButtonClick('Dashboard')
+    this.onSidebarButtonClick('Dashboard');
   }
   chatBoxToggle() {
     this.isChatActive = !this.isChatActive;
@@ -938,5 +954,16 @@ export class ShipperLayoutComponent implements OnInit {
       console.log('the target is ', target === 'Pickup Details');
       this.onSidebarButtonClick('Pick-up Locations');
     }
+  }
+  getReadableDate(isoDate: string): string {
+    const date = new Date(isoDate);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
   }
 }

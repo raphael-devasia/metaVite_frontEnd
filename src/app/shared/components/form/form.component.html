@@ -3,7 +3,7 @@
         <h2 class="text-xl font-semibold mb-4">{{ formTitle }}</h2>
 
         <!-- Personal Information Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div *ngFor="let field of personalInformation">
                 <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
                 <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
@@ -19,7 +19,7 @@
                     </small>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!-- Personal Information Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div *ngFor="let field of personalInformation">
@@ -35,7 +35,12 @@
                     <small *ngIf="formGroup.get(field.id)?.errors?.['pattern']" class="text-red-600">
                         Please enter a valid format
                     </small>
+                    <small *ngIf="formGroup.get(field.id)?.errors?.['invalidName']" class="text-red-600"> Only letters and spaces,
+                        minimum 3 characters. </small>
                 </div>
+                <small *ngIf="formGroup.get(field.id)?.errors?.['invalidPhoneNumber']" class="text-red-600"> Please enter a valid
+                    Indian phone number. </small> <small *ngIf="formGroup.get(field.id)?.errors?.['email']" class="text-red-600">
+                    Please enter a valid email. </small>
             </div>
         </div>
 
@@ -58,6 +63,8 @@
                         <small *ngIf="formGroup.get(field.id)?.hasError('required')" class="text-red-600">
                             This field is required.
                         </small>
+                        <small *ngIf="formGroup.get(field.id)?.errors?.['invalidName']" class="text-red-600"> Only letters and spaces,
+                            minimum 3 characters. </small>
 
                         <!-- Pattern error (if applicable) -->
                         <small *ngIf="formGroup.get(field.id)?.hasError('pattern')" class="text-red-600">
@@ -68,6 +75,9 @@
                         <small *ngIf="formGroup.get(field.id)?.hasError('pastDate')" class="text-red-600">
                             The date must be in the future.
                         </small>
+                        <small *ngIf="formGroup.get(field.id)?.errors?.['invalidPhoneNumber']" class="text-red-600"> Please enter a valid
+                            Indian phone number. </small> <small *ngIf="formGroup.get(field.id)?.errors?.['email']" class="text-red-600">
+                            Please enter a valid email. </small>
 
                         <!-- Other specific validation errors (if needed) -->
                         <small *ngIf="formGroup.get(field.id)?.hasError('minlength')" class="text-red-600">
@@ -80,6 +90,10 @@
                         <small *ngIf="formGroup.get('dateOfBirth')?.hasError('required')" class="text-red-600">
                             Date of birth is required.
                         </small>
+                        <small *ngIf="formGroup.get(field.id)?.errors?.['invalidDriversLicense']" class="text-red-600"> Please enter a
+                            valid Indian driver's license number (Format: AB1234567890123). </small> <small
+                            *ngIf="formGroup.get(field.id)?.errors?.['invalidAge']" class="text-red-600"> You must be at least 18 years
+                            old. </small>
 
                         <!-- Age validation error -->
                         <small *ngIf="formGroup.get('dateOfBirth')?.hasError('underAge')" class="text-red-600">
@@ -411,11 +425,15 @@
                     <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
                         class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                         [placeholder]="field.placeholder" />
+                        
                     <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
                         class="mt-1">
-                        <small *ngIf="formGroup.get(field.id)?.errors?.['required']" class="text-red-600">
-                            This field is required
-                        </small>
+                        <small *ngIf="formGroup.get(field.id)?.errors?.['required']" class="text-red-600"> This field is required.
+                        </small> <small *ngIf="formGroup.get(field.id)?.errors?.['invalidPostalCode']" class="text-red-600"> Please enter
+                            a valid Indian postal code. </small> <small *ngIf="formGroup.get(field.id)?.errors?.['invalidCityName']"
+                            class="text-red-600"> Please enter a valid city name with only letters and spaces between words. </small> <small
+                            *ngIf="formGroup.get(field.id)?.errors?.['invalidAddress']" class="text-red-600"> Please enter a valid
+                            address with letters and numbers. </small>
                     </div>
                 </div>
             </div>
@@ -423,7 +441,7 @@
         </div>
 
         <!-- Bank Details Section -->
-        <div *ngIf="isBoardingActive &&dataToShow !=='Trucks'&&dataToShow !=='Company Details'">
+        <div *ngIf="dataToShow ==='Carrier Company Details'&&role==='carrierAdmin' &&userStatus!=='Pending'">
             <h2 class="text-xl font-semibold mb-4">Bank Details</h2>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div *ngFor="let field of bankDetails">
@@ -445,6 +463,37 @@
                             Please enter a valid IFSC code (Format: ABCD0123456).
                         </small>
 
+                        <small *ngIf="formGroup.get(field.id)?.hasError('invalidAccountNumber')" class="text-red-600">
+                            Please enter a valid account number (9 to 18 digits).
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-6">
+        </div>
+        <div
+            *ngIf="isBoardingActive &&dataToShow !=='Trucks'&&dataToShow !=='Company Details'&&role!=='carrierAdmin' &&userStatus!=='Pending'">
+            <h2 class="text-xl font-semibold mb-4">Bank Details</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let field of bankDetails">
+                    <label class="block font-medium mb-2" [for]="field.id">{{ field.label }}</label>
+                    <input [id]="field.id" [type]="field.type" [formControlName]="field.id"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="field.placeholder" />
+        
+                    <!-- Validation error messages -->
+                    <div *ngIf="formGroup.get(field.id)?.invalid && (formGroup.get(field.id)?.dirty || formGroup.get(field.id)?.touched)"
+                        class="mt-1">
+        
+                        <!-- Show only one error message at a time -->
+                        <small *ngIf="formGroup.get(field.id)?.hasError('required')" class="text-red-600">
+                            This field is required.
+                        </small>
+        
+                        <small *ngIf="formGroup.get(field.id)?.hasError('invalidIFSC')" class="text-red-600">
+                            Please enter a valid IFSC code (Format: ABCD0123456).
+                        </small>
+        
                         <small *ngIf="formGroup.get(field.id)?.hasError('invalidAccountNumber')" class="text-red-600">
                             Please enter a valid account number (9 to 18 digits).
                         </small>
@@ -502,11 +551,16 @@
             </ng-container>
 
             <!-- Continue for Non-Drivers -->
-            <ng-container *ngIf="(role==='appAdmin'||role==='carrierAdmin') && (userStatus === 'Active'||vehicleStatus==='Active')">
+            <ng-container *ngIf="(role==='appAdmin'||role==='carrierAdmin'||role==='driver') && (userStatus === 'Active'||vehicleStatus==='Active')">
                 <button *ngIf="action==='edit'" type="button" (click)="onUpdate()" [hidden]="!formGroup.dirty"
                     class="w-1/3 bg-yellow-600 text-white py-3 rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2">
                     Update
                 </button>
+                <button *ngIf="dataToShow ==='Carrier Company Details'" type="button" (click)="onUpdate()" [hidden]="!formGroup.dirty"
+                    class="w-1/3 bg-yellow-600 text-white py-3 rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2">
+                    Update
+                </button>
+               
 
                 <!-- <button type="button" (click)="onDelete()"
                     class="w-1/3 bg-red-600 text-white py-3 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">

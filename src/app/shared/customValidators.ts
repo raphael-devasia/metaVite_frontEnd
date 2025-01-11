@@ -6,6 +6,18 @@ import {
 } from '@angular/forms';
 
 export class CustomValidators {
+  static atLeast24HoursFromNow(
+    control: AbstractControl
+  ): ValidationErrors | null {
+    const currentTime = new Date();
+    const controlTime = new Date(control.value);
+
+    // Check if the dispatch time is at least 24 hours (in milliseconds) from now
+    return controlTime.getTime() - currentTime.getTime() >= 24 * 60 * 60 * 1000
+      ? null
+      : { atLeast24HoursFromNow: true };
+  }
+
   static futureDate(control: AbstractControl): ValidationErrors | null {
     const currentDate = new Date();
     const controlDate = new Date(control.value);

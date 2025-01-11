@@ -7,7 +7,9 @@ import { Invitation } from '../../../../shared/models/user';
   providedIn: 'root',
 })
 export class CarrierService {
-  private baseUrl = 'http://localhost:4000/';
+  // private baseUrl = 'http://localhost:4000/';
+  private baseUrl = 'http://a4624d01d367b4e51ae51cbe6f066c92-452922102.eu-north-1.elb.amazonaws.com:4000/';
+
   http = inject(HttpClient);
   constructor() {}
   addClients(client: any): Observable<any> {
@@ -36,6 +38,9 @@ export class CarrierService {
 
   getAllBids(refId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}carrier/bids/${refId}`);
+  }
+  getActiveBids(refId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}carrier/active-bids/${refId}`);
   }
   getAllShipments(): Observable<any> {
     return this.http.get(`${this.baseUrl}carrier/shipments`);
@@ -76,5 +81,21 @@ export class CarrierService {
   }
   getPayment(loadId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}carrier/payments/${loadId}`);
+  }
+  updateLoadInfo(userId: string, bidId: any): Observable<any> {
+    console.log(bidId);
+
+    return this.http.post(
+      `${this.baseUrl}carrier/update-load-info/${userId}`,
+      bidId
+    );
+  }
+  updateCompanyInfo(userId: string, data: any): Observable<any> {
+    console.log(data);
+
+    return this.http.post(
+      `${this.baseUrl}carrier/update-carrier-info/${userId}`,
+      data
+    );
   }
 }

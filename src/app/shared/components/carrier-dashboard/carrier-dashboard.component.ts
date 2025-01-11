@@ -120,7 +120,7 @@ export class CarrierDashboardComponent {
       const dispatchDateTime = entry.loadDetails?.dispatchDateTime;
 
       // Only count amounts for "Assigned" loads
-      if (loadStatus !== 'Delivered') {
+      if (loadStatus !== 'Completed') {
         console.log('Skipping entry with load status:', loadStatus);
         return;
       }

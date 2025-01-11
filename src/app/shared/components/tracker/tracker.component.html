@@ -1,0 +1,131 @@
+<div class="bg-white p-6 rounded-lg shadow-md w-full">
+    <!-- Stepper Section -->
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">Shipment Progress</h2>
+
+        <div class="relative">
+            <!-- Progress Bar Background -->
+            <div class="absolute top-5 left-0 w-full h-1 bg-gray-200">
+                <!-- Active Progress -->
+                <div class="absolute h-full bg-indigo-600 transition-all duration-500"
+                    [style.width]="getProgressWidth()">
+                </div>
+            </div>
+
+            <!-- Steps -->
+            <div class="relative flex justify-between">
+                <ng-container *ngFor="let step of getSteps(); let i = index">
+                    <div class="flex flex-col items-center relative">
+                        <!-- Step Circle -->
+                        <div [ngClass]="[
+                  'w-10 h-10 rounded-full flex items-center justify-center z-10',
+                  step.completed ? 'bg-indigo-600 text-white' : 
+                  step.current ? 'bg-white border-2 border-indigo-600 text-indigo-600' : 
+                  'bg-gray-200 text-gray-400'
+                ]">
+                            <mat-icon *ngIf="step.completed" class="text-sm">done</mat-icon>
+                            <mat-icon *ngIf="step.current" class="text-sm">local_shipping</mat-icon>
+                            <span *ngIf="!step.completed && !step.current">{{i + 1}}</span>
+                        </div>
+
+                        <!-- Step Label -->
+                        <span class="absolute mt-12 text-sm font-medium whitespace-nowrap" [ngClass]="[
+                        step.completed ? 'text-indigo-600' : 
+                        step.current ? 'text-indigo-800 font-semibold' : 
+                        'text-gray-400'
+                      ]">
+                            {{step.label}}
+                        </span>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Section -->
+    <div class="mt-12">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Actions</h2>
+
+        <!-- Status Messages -->
+        <div *ngIf="loadData?.status === 'Picked'" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <mat-icon class="text-yellow-400">info</mat-icon>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        <ng-container [ngSwitch]="user.role">
+                            <span *ngSwitchCase="'driver'">
+                                You have picked the load. Wait for the shipper to confirm the dispatch, then start
+                                driving.
+                            </span>
+                            <span *ngSwitchCase="'carrierAdmin'">
+                                Your driver picked the load. Waiting for the shipper to confirm the dispatch.
+                            </span>
+                        </ng-container>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waiting for Delivery Message -->
+        <div *ngIf="isWaitingForDelivery(loadData)" class="text-gray-600 mb-4">
+            Waiting for delivery {{ getDeliveryStep(loadData.status) }}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-3">
+            <!-- App Admin Actions -->
+            <ng-container *ngIf="user.role === 'appAdmin'">
+                <button *ngIf="loadData?.status === 'Assigned'"
+                    class="px-4 py-2 rounded-md text-white bg-red-500 hover:bg-red-600 transition duration-150 shadow-sm"
+                    (click)="cancelShipment(loadData._id)">
+                    Cancel Shipment
+                </button>
+            </ng-container>
+
+            <!-- Shipper Admin Actions -->
+            <ng-container *ngIf="user.role === 'shipperAdmin'">
+                <button *ngIf="loadData?.status === 'Assigned'"
+                    class="px-4 py-2 rounded-md text-white bg-red-500 hover:bg-red-600 transition duration-150 shadow-sm"
+                    (click)="cancelShipment(loadData._id)">
+                    Cancel Shipment
+                </button>
+
+                <button *ngIf="loadData?.status === 'Picked'"
+                    class="px-4 py-2 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 shadow-sm"
+                    (click)="updateStatus(loadData._id, 'Dispatched')">
+                    Confirm Dispatch
+                </button>
+
+                <ng-container *ngIf="getShipperAction(loadData) as action">
+                    <button [class]="action.class" (click)="updateStatus(loadData._id, action.nextStatus)">
+                        {{action.label}}
+                    </button>
+                </ng-container>
+            </ng-container>
+
+            <!-- Driver Actions -->
+            <ng-container *ngIf="user.role === 'driver'">
+                <button *ngIf="loadData?.status === 'Assigned'"
+                    class="px-4 py-2 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 shadow-sm"
+                    (click)="updateStatus(loadData._id, 'Picked')">
+                    Confirm Pick-up
+                </button>
+
+                <ng-container *ngFor="let action of getDriverActions(loadData)">
+                    <button [class]="action.class" (click)="updateStatus(loadData._id, action.nextStatus)">
+                        {{action.label}}
+                    </button>
+                </ng-container>
+            </ng-container>
+
+            <!-- Common Cancel Button -->
+            <button
+                class="px-4 py-2 rounded-md text-white bg-gray-500 hover:bg-gray-600 transition duration-150 shadow-sm"
+                (click)="toggleExpand()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>

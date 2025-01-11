@@ -53,3 +53,86 @@ button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+
+/* .form-container {
+  background: linear-gradient(to bottom, #ffffff, #f8fafc);
+  min-height: 100vh;
+} */
+
+/* Input and Select Transitions */
+input, select {
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus, select:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Disabled State */
+input:disabled, select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Error State Animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+.form-field .error-message {
+  animation: shake 0.2s ease-in-out;
+}
+
+/* Required Field Indicator */
+label span {
+  margin-left: 2px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Section Headers */
+h2 {
+  position: relative;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, #3b82f6, transparent);
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 768px) {
+  .grid {
+    gap: 1rem;
+  }
+  
+  .form-field {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .form-container {
+    background: none;
+    box-shadow: none;
+  }
+  
+  button {
+    display: none;
+  }
+}

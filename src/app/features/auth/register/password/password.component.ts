@@ -86,7 +86,12 @@ export class PasswordComponent implements OnInit {
     });
     this.formGroup.statusChanges.subscribe((status) => {
       if (status === 'VALID') {
-        this.buttonActivate.emit(true);
+        console.log('valid activated');
+        this.buttonActivate.emit(true); // Emit true if form is valid
+      } else {
+        console.log('invalid activated');
+
+        this.buttonActivate.emit(false); // Emit false if form is not valid
       }
     });
     this.submitEvent.subscribe(() => this.onsubmit());

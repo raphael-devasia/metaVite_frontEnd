@@ -13,11 +13,12 @@ import { CommonModule } from '@angular/common';
 import { DriverService } from './services/driver.service';
 import { LocalstorageService } from '../../core/services/localstorage.service';
 import { SuccessComponent } from '../../shared/components/success/success.component';
-import { ageValidator, fileValidator } from '../../shared/customValidators';
+
 import { DataService } from '../../shared/services/data.service';
 import { CarrierService } from '../../core/services/shipper/carrier/carrier.service';
 import { tap } from 'rxjs';
 import { TableComponent } from '../../shared/components/table/table.component';
+import { Router } from '@angular/router';
 // import { ErrorComponent } from "../../shared/components/error/error.component";
 
 interface FormField {
@@ -27,6 +28,54 @@ interface FormField {
   placeholder: string;
   value?: string;
   disabled?: boolean;
+  options?: string[];
+}
+const indianStates = [
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+  'Andaman and Nicobar Islands',
+  'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu',
+  'Lakshadweep',
+  'Delhi',
+  'Puducherry',
+  'Ladakh',
+  'Jammu and Kashmir',
+];
+
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero
+  const day = date.getDate().toString().padStart(2, '0'); // Add leading zero
+
+  return `${year}-${month}-${day}`;
 }
 export function noPastDateValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: boolean } | null => {
@@ -56,6 +105,63 @@ export function accountNumberValidator(): ValidatorFn {
     return null;
   };
 }
+export function nameValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    // Validates names with at least one letter and allows spaces between names
+    const valid =
+      /^[a-zA-Z]+(\s+[a-zA-Z]+)*$/.test(control.value) &&
+      control.value.trim().length >= 3;
+    return valid ? null : { invalidName: { value: control.value } };
+  };
+}
+// Custom validator for Indian phone numbers
+export function indianPhoneNumberValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const valid = /^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/.test(control.value);
+    return valid ? null : { invalidPhoneNumber: { value: control.value } };
+  };
+}
+
+
+// Custom validator for Indian driver's license numbers
+export function driversLicenseValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const valid = /^[A-Z]{2}[0-9]{13}$/.test(control.value);
+    return valid ? null : { invalidDriversLicense: { value: control.value } };
+  };
+}
+export function ageValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const dob = new Date(control.value);
+    const ageDifMs = Date.now() - dob.getTime();
+    const ageDate = new Date(ageDifMs); // milliseconds from epoch
+    const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+    return age >= 18 ? null : { invalidAge: { value: control.value } };
+  };
+}
+
+
+export function postalCodeValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const valid = /^[1-9][0-9]{5}$/.test(control.value);
+    return valid ? null : { invalidPostalCode: { value: control.value } };
+  };
+}
+export function cityNameValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const valid = /^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/.test(control.value.trim());
+    return valid ? null : { invalidCityName: { value: control.value } };
+  };
+}
+export function addressValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const valid = /^[a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*$/.test(
+      control.value.trim()
+    );
+    return valid ? null : { invalidAddress: { value: control.value } };
+  };
+}
+
 
 
 @Component({
@@ -66,7 +172,8 @@ export function accountNumberValidator(): ValidatorFn {
     SidebarComponent,
     FormComponent,
     CommonModule,
-    SuccessComponent,TableComponent
+    SuccessComponent,
+    TableComponent,
   ],
   templateUrl: './driver-layout.component.html',
   styleUrls: ['./driver-layout.component.css'],
@@ -75,14 +182,20 @@ export class DriverLayoutComponent implements OnInit {
   personalInfoForm: FormGroup;
   showForm: boolean = false;
   showModal: boolean = false;
+  isDriver = true;
+  userStatus: string = 'Active';
+  role: string = 'driver';
+
+  action!: string;
+
   selectedFileName: string = '';
-  buttonTexts: string[] = ['Driver On-Boarding'];
-  activeButtonTexts: string[] = [
-    'Dashboard',
-    'My Loads',
-    'My Details',
-    'My Location',
-    'Logout',
+  buttonTexts: any[] = [{ text: 'Driver On-Boarding', icon: 'assignment_ind' }];
+  activeButtonTexts: any[] = [
+    // { text: 'Dashboard', icon: 'dashboard' },
+    { text: 'My Loads', icon: 'local_shipping' },
+    { text: 'My Details', icon: 'person' },
+    // { text: 'My Location', icon: 'location_on' },
+    { text: 'Log Out', icon: 'logout' },
   ];
 
   driverData = inject(DriverService);
@@ -195,17 +308,19 @@ export class DriverLayoutComponent implements OnInit {
   ];
   shipmentTableData = {
     title: 'All Shipments',
-    button: 'Add New Load',
+    button: '',
     statuses: ['Assigned ', 'Dispatched', 'Delivered'],
     tableHeads: [
       'Load ID',
       'Drop City',
-      'Commodity',
-      'Shipper Name',
+      'Pick City',
+
       'Pickup Date',
 
       'Base Price',
       'Bid Price',
+      'Status',
+      'Actions',
     ],
     tableData: [],
   };
@@ -239,7 +354,13 @@ export class DriverLayoutComponent implements OnInit {
       placeholder: 'Enter Address Line 2',
     },
     { id: 'city', label: 'City', type: 'text', placeholder: 'Enter City' },
-    { id: 'state', label: 'State', type: 'text', placeholder: 'Enter State' },
+    {
+      id: 'state',
+      label: 'State',
+      type: 'select',
+      placeholder: 'Enter State',
+      options: indianStates,
+    },
     {
       id: 'postalCode',
       label: 'Postal Code',
@@ -250,34 +371,45 @@ export class DriverLayoutComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    @Inject(DataService) private dataService: DataService
+    @Inject(DataService) private dataService: DataService,
+    private router: Router,
   ) {
     this.personalInfoForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: ['', [Validators.required, nameValidator()]],
+      lastName: ['', [Validators.required, nameValidator()]],
       email: [
         { value: '', disabled: true },
         [Validators.required, Validators.email],
       ],
-      phoneNumber: ['', Validators.required],
+      phoneNumber: ['', [Validators.required, indianPhoneNumberValidator()]],
       companyRefId: [{ value: '', disabled: true }, Validators.required],
       companyName: [{ value: '', disabled: true }, Validators.required],
-      driversLicenseNumber: ['', Validators.required],
+      driversLicenseNumber: [
+        '',
+        [Validators.required, driversLicenseValidator()],
+      ],
       driversLicenseExpiry: ['', [Validators.required, noPastDateValidator()]],
       dateOfBirth: ['', [Validators.required, ageValidator()]],
-      emergencyContactName: ['', Validators.required],
-      emergencyNumber: ['', Validators.required],
-      addressLine1: ['', Validators.required],
-      addressLine2: ['', Validators.required],
-      city: ['', Validators.required],
+      emergencyContactName: ['', [Validators.required, nameValidator()]],
+      emergencyNumber: [
+        '',
+        [Validators.required, indianPhoneNumberValidator()],
+      ],
+      addressLine1: ['', [Validators.required, addressValidator()]],
+      addressLine2: ['', [Validators.required, addressValidator()]],
+      city: ['', [Validators.required, cityNameValidator()]],
       state: ['', Validators.required],
-      postalCode: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
+      postalCode: ['', [Validators.required, postalCodeValidator()]],
       aadharCardNumber: [
         '',
         [Validators.required, Validators.pattern('^[0-9]{12}$')],
       ],
       ifscCode: ['', [Validators.required, ifscCodeValidator()]],
       accountNumber: ['', [Validators.required, accountNumberValidator()]],
+      _id: [''],
+      isActive: [true],
+      status: [''],
+      workStatus: [''],
       // idFile: [null, [Validators.required, fileValidator()]],
       // contractFile: [null, [Validators.required, fileValidator()]],
     });
@@ -286,6 +418,17 @@ export class DriverLayoutComponent implements OnInit {
   selectedComponent: string = 'Driver On-Boarding';
 
   ngOnInit(): void {
+    this.dataService.data$.subscribe((receivedData) => {
+      console.log(receivedData);
+
+      if (receivedData === 'Shipments') {
+        this.onSidebarButtonClick('My Loads');
+        console.log('My Loads');
+      } if (receivedData === 'My Details') {
+        this.onSidebarButtonClick('My Loads');
+        console.log('My Loads');
+      }
+    });
     let userId;
     const userData = localStorage.getItem('driverData');
 
@@ -305,6 +448,9 @@ export class DriverLayoutComponent implements OnInit {
             console.log(data);
             if (data.user.driversLicenseNumber) {
               this.isBoardingSuccess = 'success';
+            }
+            if(this.status==='Active'){
+              this.onSidebarButtonClick('My Loads')
             }
 
             const user = data.user;
@@ -346,7 +492,6 @@ export class DriverLayoutComponent implements OnInit {
   onSidebarButtonClick(component: string): void {
     this.selectedComponent = component;
     console.log(component);
-    
 
     if (component === 'My Loads') {
       const user: any = this.localstorage.getDriverData();
@@ -365,18 +510,30 @@ export class DriverLayoutComponent implements OnInit {
               (bid: any) =>
                 bid.status === 'Assigned' ||
                 bid.status === 'Dispatched' ||
-                bid.status === 'Delivered'
+                bid.status === 'Delivered' ||
+                bid.status === 'Picked' ||
+                bid.status === 'Delivered1' ||
+                bid.status === 'Delivered2' ||
+                bid.status === 'Delivered3' ||
+                bid.status === 'Delivered' ||
+                bid.status === 'Delivered1-Partial' ||
+                bid.status === 'Delivered2-Partial' ||
+                bid.status === 'Delivered3-Partial' ||
+                bid.status === 'Delivered' ||
+                bid.status === 'Completed'
             );
             this.shipmentTableData = {
               ...this.shipmentTableData,
               tableData: filteredData.map((bid: any) => ({
-                loadId: bid.email || '',
+                loadId: bid.loadId || '',
                 dropCity: bid.dropoff1?.address?.city || '',
-                commodity: bid.material || 'Unknown', // Add logic for status if not in data
-                vehicleType: bid.vehicleBody || '',
-                trailerType: bid.vehicleType || '',
+                pickCity: bid.pickupLocation?.address?.city || '',
+
+                pickUpdate: this.getReadableDate(bid.dispatchDateTime) || '',
+
                 basePrice: bid.basePrice || '',
-                lowestBid: bid.basePrice || '',
+                lowestBid: bid.lowestPrice || '--',
+                status: bid.status,
                 _id: bid._id,
               })),
             };
@@ -393,51 +550,86 @@ export class DriverLayoutComponent implements OnInit {
           error: (err) => {},
         });
     }
-     if (component === 'My Details') {
-       const user: any = this.localstorage.getDriverData();
-       console.log(user);
+    if (component === 'My Details') {
+      const user: any = this.localstorage.getDriverData();
+      console.log(user);
 
-       this.driverData.getDriver(user._id).subscribe(
-         (data) => {
-           if (data.success) {
-             this.status = data.user.status;
-             console.log(data);
-             if (data.user.driversLicenseNumber) {
-               this.isBoardingSuccess = 'success';
-             }
+      this.driverData.getDriver(user._id).subscribe({
+        next: (data) => {
+          if (data.success) {
+            this.status = data.user.status;
+            console.log(data);
+            if (data.user.driversLicenseNumber) {
+              this.isBoardingSuccess = 'success';
+            }
 
-             const user = data.user;
-             console.log(user.personalDetails.address.addressLine1);
-             this.personalInfoForm.patchValue({
-               firstName: user.name.firstName,
-               lastName: user.name.lastName,
-               email: user.email,
-               phoneNumber: user.phoneNumber || '',
-               companyRefId: user.companyRefId,
-               companyName: user.companyDetails
-                 ? user.companyDetails.companyDetails?.companyName
-                 : '',
-               emergencyContactName: user.personalDetails.emergencyContact.name,
-               emergencyNumber:
-                 user.personalDetails.emergencyContact.phoneNumber,
-               addressLine1: user.personalDetails.address.addressLine1,
-               addressLine2: user.personalDetails.address.addressLine2,
-               city: user.personalDetails.address.city,
-               state: user.personalDetails.address.state,
-               postalCode: user.personalDetails.address.postalCode,
-             });
-           }
-         },
-         (error) => {
-           console.error('Failed to fetch driver data', error);
-         }
-       );
-     }
-    
+            const user = data.user;
+            console.log(user.personalDetails.address.addressLine1);
+            // this.personalInfoForm.patchValue({
+            //   firstName: user.name.firstName,
+            //   lastName: user.name.lastName,
+            //   email: user.email,
+            //   phoneNumber: user.phoneNumber || '',
+            //   companyRefId: user.companyRefId,
+            //   companyName: user.companyDetails
+            //     ? user.companyDetails.companyDetails?.companyName
+            //     : '',
+            //   emergencyContactName: user.personalDetails.emergencyContact.name,
+            //   emergencyNumber:
+            //     user.personalDetails.emergencyContact.phoneNumber,
+            //   addressLine1: user.personalDetails.address.addressLine1,
+            //   addressLine2: user.personalDetails.address.addressLine2,
+            //   city: user.personalDetails.address.city,
+            //   state: user.personalDetails.address.state,
+            //   postalCode: user.personalDetails.address.postalCode,
+            // });
+            this.personalInfoForm.patchValue({
+              firstName: user.name.firstName,
+              lastName: user.name.lastName,
+              email: user.email,
+              phoneNumber: user.phoneNumber || '',
+              companyRefId: user.companyRefId,
+              companyName: user.companyDetails
+                ? user.companyDetails.companyDetails?.companyName
+                : '',
+              emergencyContactName: user.personalDetails.emergencyContact.name,
+              emergencyNumber:
+                user.personalDetails.emergencyContact.phoneNumber,
+              addressLine1: user.personalDetails.address.addressLine1,
+              addressLine2: user.personalDetails.address.addressLine2,
+              city: user.personalDetails.address.city,
+              state: user.personalDetails.address.state,
+              postalCode: user.personalDetails.address.postalCode,
+              driversLicenseNumber: user.driversLicenseNumber || '',
+              driversLicenseExpiry: formatDate(user.driversLicenseExpiry || ''),
+              aadharCardNumber: user.aadharCardNumber || 'Not Available',
+              dateOfBirth: formatDate(user.dateOfBirth || 'Not Available'),
+              ifscCode: user.ifscCode || '',
+              accountNumber: user.accountNumber || '',
+              bankName: user.bankName || 'Bank',
+              status: user.status,
+              workStatus: user.workStatus,
+              _id: user._id,
+            });
 
-
-
-    
+            // Set showForm to true and showModal to false after populating the data
+            this.formTitle = 'My Details';
+            this.isDriver = false;
+            this.action = 'edit';
+            this.showForm = true;
+            this.showModal = false;
+            this.selectedComponent = component;
+          }
+        },
+        error: (err) => {
+          console.error('Failed to fetch driver data', err);
+        },
+      });
+    }if(component ==='Log Out'){
+       localStorage.removeItem('driverData');
+       localStorage.removeItem('driverToken');
+       this.router.navigate(['/carrier/driver']);
+    }
   }
 
   // toggleBoarding(): void {
@@ -497,5 +689,16 @@ export class DriverLayoutComponent implements OnInit {
   isOn_BoardingSuccess($event: string) {
     console.log($event);
     this.isBoardingSuccess = $event;
+  }
+  getReadableDate(isoDate: string): string {
+    const date = new Date(isoDate);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
   }
 }

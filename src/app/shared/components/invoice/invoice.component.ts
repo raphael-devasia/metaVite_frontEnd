@@ -17,6 +17,8 @@ export class InvoiceComponent {
   constructor(
     public dialogRef: MatDialogRef<InvoiceComponent>,
     @Inject(MAT_DIALOG_DATA) public invoiceData: any
+   
+    
   ) {}
   
 

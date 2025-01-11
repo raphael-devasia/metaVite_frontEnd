@@ -1,4 +1,4 @@
-<div class="flex flex-col justify-center py-12 sm:px-6 lg:px-8 p-4 m-4 w-full">
+<!-- <div class="flex flex-col justify-center py-12 sm:px-6 lg:px-8 p-4 ml-2  w-full">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 class="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
             Create a new account
@@ -14,7 +14,7 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <form [formGroup]="formGroup" class="flex flex-col justify-self-center p-4 m-4 dark:bg-gray-950"
+            <form [formGroup]="formGroup" class="flex flex-col justify-self-center p-4 m-4"
                 >
                 <div>
                     <label for="firstName" class="block text-sm font-medium leading-5 text-gray-700">First Name</label>
@@ -74,6 +74,119 @@
                     </div>
                 </div>
                
+            </form>
+        </div>
+    </div>
+</div> -->
+
+<div class="flex flex-col justify-center py-12 sm:px-6 lg:px-8 p-4 ml-2 w-full">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 class="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
+            Create a new account
+        </h2>
+        <p class="mt-2 text-center text-sm leading-5 text-gray-500 max-w">
+            Or
+            <a href="/admin"
+                class="font-medium text-blue-600 hover:text-blue-500 focus:outline-none focus:underline transition ease-in-out duration-150">
+                login to your account
+            </a>
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            <form [formGroup]="formGroup" class="flex flex-col justify-self-center p-4 m-4">
+                <div>
+                    <label for="firstName" class="block text-sm font-medium leading-5 text-gray-700">First Name</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input id="firstName" formControlName="firstName" placeholder="John" type="text" required
+                            class="appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                            [ngClass]="{'border-red-500': formGroup.get('firstName')?.touched && formGroup.get('firstName')?.invalid,
+                                      'border-gray-300': !formGroup.get('firstName')?.touched || !formGroup.get('firstName')?.invalid}">
+                        <div *ngIf="formGroup.get('firstName')?.touched && formGroup.get('firstName')?.invalid"
+                            class="text-red-500 text-sm mt-1">
+                            <span *ngIf="formGroup.get('firstName')?.errors?.['required']">First name is
+                                required.</span>
+                            <span *ngIf="formGroup.get('firstName')?.errors?.['minlength']">First name must be at least
+                                2 characters.</span>
+                            <span *ngIf="formGroup.get('firstName')?.errors?.['pattern']">Please enter valid letters
+                                only.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label for="lastName" class="block text-sm font-medium leading-5 text-gray-700">Last Name</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input id="lastName" formControlName="lastName" placeholder="Doe" type="text" required
+                            class="appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                            [ngClass]="{'border-red-500': formGroup.get('lastName')?.touched && formGroup.get('lastName')?.invalid,
+                                      'border-gray-300': !formGroup.get('lastName')?.touched || !formGroup.get('lastName')?.invalid}">
+                        <div *ngIf="formGroup.get('lastName')?.touched && formGroup.get('lastName')?.invalid"
+                            class="text-red-500 text-sm mt-1">
+                            <span *ngIf="formGroup.get('lastName')?.errors?.['required']">Last name is required.</span>
+                            <span *ngIf="formGroup.get('lastName')?.errors?.['minlength']">Last name must be at least 2
+                                characters.</span>
+                            <span *ngIf="formGroup.get('lastName')?.errors?.['pattern']">Please enter valid letters
+                                only.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label for="email" class="block text-sm font-medium leading-5 text-gray-700">Email address</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input id="email" formControlName="email" placeholder="user@example.com" type="email" required
+                            class="appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                            [ngClass]="{'border-red-500': formGroup.get('email')?.touched && formGroup.get('email')?.invalid,
+                                      'border-gray-300': !formGroup.get('email')?.touched || !formGroup.get('email')?.invalid}">
+                        <div *ngIf="formGroup.get('email')?.touched && formGroup.get('email')?.invalid"
+                            class="text-red-500 text-sm mt-1">
+                            <span *ngIf="formGroup.get('email')?.errors?.['required']">Email is required.</span>
+                            <span
+                                *ngIf="formGroup.get('email')?.errors?.['email'] || formGroup.get('email')?.errors?.['pattern']">
+                                Please enter a valid email address.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label for="password" class="block text-sm font-medium leading-5 text-gray-700">Password</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input id="password" formControlName="password" type="password" required
+                            class="appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                            [ngClass]="{'border-red-500': formGroup.get('password')?.touched && formGroup.get('password')?.invalid,
+                                      'border-gray-300': !formGroup.get('password')?.touched || !formGroup.get('password')?.invalid}">
+                        <div *ngIf="formGroup.get('password')?.touched && formGroup.get('password')?.invalid"
+                            class="text-red-500 text-sm mt-1">
+                            <span *ngIf="formGroup.get('password')?.errors?.['required']">Password is required.</span>
+                            <span *ngIf="formGroup.get('password')?.errors?.['minlength']">Password must be at least 8
+                                characters.</span>
+                            <span *ngIf="formGroup.get('password')?.errors?.['pattern']">
+                                Password must contain uppercase, lowercase, number, and special character.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label for="confirm_password" class="block text-sm font-medium leading-5 text-gray-700">Confirm
+                        Password</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input id="confirm_password" formControlName="confirm_password" type="password" required
+                            class="appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                            [ngClass]="{'border-red-500': formGroup.get('confirm_password')?.touched && formGroup.get('confirm_password')?.invalid,
+                                      'border-gray-300': !formGroup.get('confirm_password')?.touched || !formGroup.get('confirm_password')?.invalid}">
+                        <div *ngIf="formGroup.get('confirm_password')?.touched && formGroup.get('confirm_password')?.invalid"
+                            class="text-red-500 text-sm mt-1">
+                            <span *ngIf="formGroup.get('confirm_password')?.errors?.['required']">Please confirm your
+                                password.</span>
+                            <span *ngIf="formGroup.get('confirm_password')?.errors?.['mustMatch']">Passwords must
+                                match.</span>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
     </div>

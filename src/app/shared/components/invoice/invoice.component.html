@@ -80,36 +80,47 @@
         </div>
 
         <!-- Service Details -->
-        <div class="mb-8">
-            <h2 class="text-lg font-bold text-gray-800 mb-4">Service Details</h2>
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-700">
-                        <th class="p-2 text-sm font-semibold">Description</th>
-                        <th class="p-2 text-sm font-semibold text-right">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="border-b p-2">
-                            <p class="font-medium">Transportation Service</p>
-                            <p class="text-sm text-gray-500">Material: {{ invoiceData?.loadDetails.material }}</p>
-                            <p class="text-sm text-gray-500">Quantity: {{ invoiceData?.loadDetails.quantity }}</p>
-                            <p class="text-sm text-gray-500">Vehicle: {{ invoiceData?.loadDetails.vehicleType }} ({{
-                                invoiceData?.loadDetails.vehicleBody }})</p>
-                        </td>
-                        <td class="border-b p-2 text-right text-gray-700">₹{{ (invoiceData?.amount / 100) | number:'1.2-2' }}</td>
-                    </tr>
-                </tbody>
-                <tfoot>
+    <div class="mb-8">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Service Details</h2>
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-100 text-gray-700">
+                    <th class="p-2 text-sm font-semibold">Description</th>
+                    <th class="p-2 text-sm font-semibold text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="border-b p-2">
+                        <p class="font-medium">Transportation Service</p>
+                        <p class="text-sm text-gray-500">Material: {{ invoiceData?.loadDetails.material }}</p>
+                        <p class="text-sm text-gray-500">Quantity: {{ invoiceData?.loadDetails.quantity }}</p>
+                        <p class="text-sm text-gray-500">Vehicle: {{ invoiceData?.loadDetails.vehicleType }} ({{
+                            invoiceData?.loadDetails.vehicleBody }})</p>
+                    </td>
+                    <td class="border-b p-2 text-right text-gray-700">₹{{ (invoiceData?.amount / 100 -invoiceData?.platformFee / 100) | number:'1.2-2' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="border-b p-2">
+                        <p class="font-medium">Platform Fees</p>
+                        <p class="text-sm text-gray-500">(5% of the total amount)</p>
+                    </td>
+                    <td class="border-b p-2 text-right text-gray-700">₹{{ (invoiceData?.platformFee / 100) | number:'1.2-2'
+                        }}</td>
+                </tr>
+            </tbody>
+            <tfoot>
                 <tr>
                     <td class="p-2 text-right font-semibold">Total Amount:</td>
-                    <td class="p-2 text-right font-bold text-gray-800">₹{{ (invoiceData?.amount / 100) | number:'1.2-2' }}</td>
+                    <td class="p-2 text-right font-bold text-gray-800">
+                        ₹{{ (invoiceData?.amount / 100) | number:'1.2-2' }}
+                    </td>
                 </tr>
+            </tfoot>
+        </table>
+    </div>
 
-                </tfoot>
-            </table>
-        </div>
 
         <!-- Footer -->
         <div class="border-t pt-4">

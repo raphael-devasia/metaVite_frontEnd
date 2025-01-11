@@ -7,13 +7,14 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:4000/';
+  // private baseUrl = 'http://localhost:4000/';
+  private baseUrl = 'http://a4624d01d367b4e51ae51cbe6f066c92-452922102.eu-north-1.elb.amazonaws.com:4000/';
   http = inject(HttpClient);
   constructor() {}
   registerUser(user: User): Observable<any> {
     return this.http.post(`${this.baseUrl}auth/register`, user);
   }
-  loginUser(user:LoginDetails): Observable<any> {
+  loginUser(user: LoginDetails): Observable<any> {
     return this.http.post(`${this.baseUrl}auth/login`, user);
   }
 }

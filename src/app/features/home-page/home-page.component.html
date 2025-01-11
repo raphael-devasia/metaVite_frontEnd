@@ -1,39 +1,51 @@
-<section id="features" class="container mx-auto px-4 space-y-6 bg-slate-50 py-8 md:py-12 lg:py-20">
-    <div class="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
-        <h2 class="font-bold text-3xl leading-[1.1] sm:text-3xl md:text-6xl">Choose One</h2>
+<section id="features" class=" min-h-screen  container mx-auto px-4 space-y-8 bg-slate-100 py-8 md:py-12 lg:py-20">
+    <div class="mx-auto flex max-w-4xl flex-col items-center space-y-4 text-center">
+        <h2 class="font-bold text-3xl leading-tight sm:text-4xl md:text-5xl text-gray-800">Choose Your Role</h2>
+        <p class="text-gray-600 text-sm md:text-base">Select the role you want to proceed with.</p>
     </div>
 
-    <div class="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+    <!-- Main Buttons -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mx-auto max-w-5xl">
         <button routerLink="/shipper"
-            class="relative overflow-hidden rounded-lg border bg-white select-none hover:shadow hover:shadow-teal-200 p-2 text-left w-full">
+            class="relative overflow-hidden rounded-lg border bg-white hover:shadow-lg p-4 text-center transition-all duration-300">
             <div class="flex flex-col justify-center items-center h-[180px] p-6">
                 <mat-icon class="w-16 h-16 text-indigo-500">business</mat-icon>
-                <div class="space-y-2 text-center">
-                    <h3 class="font-bold">Shipper</h3>
-                    <p class="text-sm text-muted-foreground"></p>
-                </div>
+                <h3 class="font-bold text-lg mt-4 text-gray-700">Shipper</h3>
             </div>
         </button>
 
-        <button routerLink="/carrier"
-            class="relative overflow-hidden rounded-lg border bg-white select-none hover:shadow hover:shadow-teal-200 p-2 text-left w-full">
+        <button (click)="selectCarrier()"
+            class="relative overflow-hidden rounded-lg border bg-white hover:shadow-lg p-4 text-center transition-all duration-300">
             <div class="flex flex-col justify-center items-center h-[180px] p-6">
                 <mat-icon class="w-16 h-16 text-purple-500">local_shipping</mat-icon>
-                <div class="space-y-2 text-center">
-                    <h3 class="font-bold">Carrier</h3>
-                    <p class="text-sm"></p>
-                </div>
+                <h3 class="font-bold text-lg mt-4 text-gray-700">Carrier</h3>
             </div>
         </button>
 
         <button routerLink="/admin"
-            class="relative overflow-hidden rounded-lg border bg-white select-none hover:shadow hover:shadow-teal-200 p-2 text-left w-full">
+            class="relative overflow-hidden rounded-lg border bg-white hover:shadow-lg p-4 text-center transition-all duration-300">
             <div class="flex flex-col justify-center items-center h-[180px] p-6">
                 <mat-icon class="w-16 h-16 text-red-500">admin_panel_settings</mat-icon>
-                <div class="space-y-2 text-center">
-                    <h3 class="font-bold">Admin</h3>
-                    <p class="text-sm text-muted-foreground"></p>
-                </div>
+                <h3 class="font-bold text-lg mt-4 text-gray-700">Admin</h3>
+            </div>
+        </button>
+    </div>
+
+    <!-- Sub Buttons (Visible Only If Carrier is Selected) -->
+    <div *ngIf="isCarrierSelected" class="grid grid-cols-1 sm:grid-cols-2 gap-6 mx-auto max-w-4xl mt-8">
+        <button routerLink="/carrier"
+            class="relative overflow-hidden rounded-lg border bg-white hover:shadow-lg p-4 text-center transition-all duration-300">
+            <div class="flex flex-col justify-center items-center h-[180px] p-6">
+                <mat-icon class="w-16 h-16 text-purple-500">local_shipping</mat-icon>
+                <h3 class="font-bold text-lg mt-4 text-gray-700">Carrier Admin</h3>
+            </div>
+        </button>
+
+        <button routerLink="/carrier/driver"
+            class="relative overflow-hidden rounded-lg border bg-white hover:shadow-lg p-4 text-center transition-all duration-300">
+            <div class="flex flex-col justify-center items-center h-[180px] p-6">
+                <mat-icon class="w-16 h-16 text-green-500">drive_eta</mat-icon>
+                <h3 class="font-bold text-lg mt-4 text-gray-700">Driver</h3>
             </div>
         </button>
     </div>

@@ -112,6 +112,8 @@ export class AdressModalComponent {
   close() {
     this.onClose.emit();
     console.log('onclose emitted');
+    console.log(this.modalHeading);
+    
     this.updateResource(this.modalHeading);
   }
 }
