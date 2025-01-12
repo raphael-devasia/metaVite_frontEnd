@@ -1,7 +1,7 @@
 export const environment = {
-  production: false,
-  SOCKET_ENDPOINT: 'ws://localhost:3000',
-  SOCKET_ENDPOINT2: 'ws://localhost:5001',
+  production: true,
+   SOCKET_ENDPOINT: 'https://metavite.ddns.net',
+  SOCKET_ENDPOINT2: 'https://metavite.ddns.net'
 };
 
 

@@ -1,31 +1,67 @@
 import { Injectable } from '@angular/core';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SocketioService {
-  socket: any;
+  socket!: Socket;
+  private connected = new BehaviorSubject<boolean>(false);
+  connected$ = this.connected.asObservable();
 
   constructor() {
     this.setupSocketConnection();
   }
 
-  setupSocketConnection() {
-    this.socket = io(environment.SOCKET_ENDPOINT, {
-      secure: true,
-      rejectUnauthorized: false,
-    });
+  // setupSocketConnection() {
+  //   this.socket = io(environment.SOCKET_ENDPOINT, {
+  //     secure: true,
+  //     rejectUnauthorized: false,
+  //   });
 
-    // Listen for broadcast messages
-    this.socket.on('my broadcast', (data: string) => {
-      console.log('Broadcast received:', data);
-    });
+  //   // Listen for broadcast messages
+  //   this.socket.on('my broadcast', (data: string) => {
+  //     console.log('Broadcast received:', data);
+  //   });
+  // }
+
+  setupSocketConnection() {
+    try {
+      // Match the ingress path configuration
+      const socketUrl = 'https://metavite.ddns.net'; // Use HTTPS for initial connection
+
+      this.socket = io(socketUrl, {
+        path: '/socketiochat/socket.io', // Match your ingress path
+        secure: true,
+        rejectUnauthorized: false,
+        transports: ['websocket', 'polling'], // Match server configuration
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        withCredentials: true, // Enable CORS credentials
+      });
+
+      this.socket.on('connect', () => {
+        console.log('Socket connected successfully', this.socket.id);
+        this.connected.next(true);
+      });
+
+      this.socket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
+      });
+
+      this.socket.on('disconnect', () => {
+        console.log('Socket disconnected');
+        this.connected.next(false);
+      });
+    } catch (error) {
+      console.error('Error setting up socket connection:', error);
+    }
   }
+
   onLowestBidUpdate(callback: (data: any) => void): void {
-    
     this.socket.on('lowestBidUpdate', callback);
   }
 
