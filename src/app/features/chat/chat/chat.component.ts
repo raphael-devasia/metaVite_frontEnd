@@ -71,10 +71,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.currentUserId = this.user._id;
     console.log('the current user id is ',this.currentUserId);
 
-    console.log('Initializing socket connection...');
-    this.socketService.connected$.subscribe((isConnected) =>
-      console.log('Socket connection status:', isConnected)
-    );
+    
     this.socketService.setupSocketConnection();
     
     // Initialize the socket connection
