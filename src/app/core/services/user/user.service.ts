@@ -8,8 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
   // private baseUrl = 'http://localhost:4000/';
-  private baseUrl =
-    'https://ac385a1c747ba4795a44cab8e15e55d4-563323433.eu-north-1.elb.amazonaws.com/';
+  private baseUrl = 'http://metavite.ddns.net/';
   http = inject(HttpClient);
   constructor() {}
   getAllDrivers(): Observable<any> {

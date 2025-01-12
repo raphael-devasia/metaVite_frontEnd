@@ -10,8 +10,7 @@ export const carrierInterceptor: HttpInterceptorFn = (req, next) => {
 
   // Initialize token as null
   let token: string | null = null;
-  let baseUrl =
-    'https://ac385a1c747ba4795a44cab8e15e55d4-563323433.eu-north-1.elb.amazonaws.com/';
+  let baseUrl = 'http://metavite.ddns.net/';
 
   // // Check if the request URL starts with specific paths
   // if (req.url.startsWith('http://localhost:4000/shipper')) {
