@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ShipperService {
   // private baseUrl = 'http://localhost:4000/';
-  private baseUrl = 'http://metavite.ddns.net/';
+  private baseUrl = 'https://metavite.ddns.net/';
   http = inject(HttpClient);
   constructor() {}
   addClients(client: any): Observable<any> {

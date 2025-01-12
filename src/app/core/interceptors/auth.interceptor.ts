@@ -3,7 +3,7 @@ import { HttpInterceptorFn } from '@angular/common/http';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   console.log('Auth Interceptor triggered');
 
-  let baseUrl = 'http://metavite.ddns.net/';
+  let baseUrl = 'https://metavite.ddns.net/';
 
   // Check if the request URL matches the specific endpoint
   // if (req.url.startsWith('http://localhost:4000/auth/register')) {

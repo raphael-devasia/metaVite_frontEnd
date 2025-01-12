@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
   // private baseUrl = 'http://localhost:4000/';
-  private baseUrl = 'http://metavite.ddns.net/';
+  private baseUrl = 'https://metavite.ddns.net/';
   http = inject(HttpClient);
   constructor() {}
   registerUser(user: User): Observable<any> {
