@@ -25,7 +25,6 @@ interface Message {
   chatId: string;
 }
 
-
 @Component({
   selector: 'app-chat',
   standalone: true,
@@ -45,7 +44,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   user: any;
   selectedUserDetails: any = null; // Details of the selected user
   selectedContact: any; // Currently selected user
-  selectedContactName:string='No User Selected'
+  selectedContactName: string = 'No User Selected';
   currentUserId!: string; // Replace with the actual user ID
 
   private subscriptions: Subscription = new Subscription();
@@ -69,23 +68,16 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.user = this.localStorageServices.getAppAdminData();
     }
     this.currentUserId = this.user._id;
-    console.log('the current user id is ',this.currentUserId);
+    console.log('the current user id is ', this.currentUserId);
 
-    
-    this.socketService.setupSocketConnection();
-    
     // Initialize the socket connection
-    // this.socketService.setupSocketConnection();
+    this.socketService.setupSocketConnection();
     this.socketService.loginUser(this.currentUserId);
     // Subscribe to incoming messages
-   
-
 
     // Fetch the list of messaged users
     this.fetchMessagedUsers();
-     this.listenForMessages();
-   
-    
+    this.listenForMessages();
   }
   ngOnChanges(changes: SimpleChanges) {
     // Detect changes in chatUser and respond
@@ -96,8 +88,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
   // Fetch the selected user's details from the database
   loadSelectedUserDetails() {
-    
-    
     if (this.chatUser) {
       const currentUrl = this.router.url;
 
@@ -108,7 +98,6 @@ export class ChatComponent implements OnInit, OnDestroy {
             this.selectedUserDetails = userDetails.user;
             console.log(this.selectedUserDetails);
             this.selectedContactName = ` ${userDetails.user.name.firstName} ${userDetails.user.name.lastName}`;
-           
           },
           (error) => {
             console.error('Error fetching user details:', error);
@@ -132,51 +121,44 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
   // Fetch previous messages between the logged-in user and the selected user
   loadPreviousMessages() {
-    this.messages = []; 
+    this.messages = [];
     this.socketService.fetchPreviousMessages(this.chatUser);
 
     const chatSubscription = this.socketService
       .onReceivePreviousMessages()
       .subscribe((data) => {
-       
-        
         this.messages = data.messages.map((msg: any) => ({
           ...msg,
           isMine: msg.senderId === this.currentUserId,
         }));
-         console.log('the previous messages are ', this.messages);
+        console.log('the previous messages are ', this.messages);
       });
-      
 
     this.subscriptions.add(chatSubscription);
   }
 
   // Send a message to the selected user
   sendMessage() {
-    
     if (this.newMessage.trim() && this.selectedUserDetails._id) {
-     const messageData = {
-       senderId: this.currentUserId,
-       recipientId: this.selectedUserDetails._id,
-       message: this.newMessage,
-       senderDetails: this.user,
-       receiverDetails: this.selectedUserDetails,
-       timestamp: new Date().toISOString(), // Add the current timestamp
-       chatId: `${this.currentUserId}_${this.selectedUserDetails._id}`, // Generate the chatId
-     };
+      const messageData = {
+        senderId: this.currentUserId,
+        recipientId: this.selectedUserDetails._id,
+        message: this.newMessage,
+        senderDetails: this.user,
+        receiverDetails: this.selectedUserDetails,
+        timestamp: new Date().toISOString(), // Add the current timestamp
+        chatId: `${this.currentUserId}_${this.selectedUserDetails._id}`, // Generate the chatId
+      };
 
       console.log(messageData);
 
       // Emit the message to the server
       this.socketService.sendMessage(messageData);
-      
 
-    const { senderDetails, receiverDetails, ...messageToSend } = messageData;
+      const { senderDetails, receiverDetails, ...messageToSend } = messageData;
       // Add the message to the local list as a sent message
       this.messages.push({ ...messageToSend, isMine: true });
       console.log(this.messages);
-      
-
 
       // Clear the input field
       this.newMessage = '';
@@ -188,14 +170,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     const messageSubscription = this.socketService
       .onReceiveMessage()
       .subscribe((data) => {
-       
-
-      
-     
-
         if (data.recipientId === this.currentUserId) {
-          
-
           this.messages.push({ ...data, isMine: false });
         } else {
           // Optionally handle notifications for messages from other users
@@ -209,10 +184,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   // Load chat with a selected user
   selectContact(contact: any) {
     console.log(contact);
-    this.selectedContactName= contact.name
+    this.selectedContactName = contact.name;
     // this.selectedContact = contact;
     this.selectedUserDetails = contact;
-    this.chatUser = contact._id
+    this.chatUser = contact._id;
     this.messages = []; // Clear current messages
 
     // Fetch the previous messages for the selected contact
@@ -235,7 +210,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       .onGetMessagedUsers()
       .subscribe((users) => {
         console.log('this function is fetch users the result', users.users);
-        
+
         this.messagedUsers = users.users;
       });
 

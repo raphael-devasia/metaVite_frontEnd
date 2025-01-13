@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -13,47 +13,13 @@ export class SocketioService {
     this.setupSocketConnection();
   }
 
-  // setupSocketConnection() {
-  //   // this.socket = io(environment.SOCKET_ENDPOINT, {
-  //   //   secure: true,
-  //   //   rejectUnauthorized: false,
-  //   // });
-
-  //   // Listen for broadcast messages
-  //   this.socket.on('my broadcast', (data: string) => {
-  //     console.log('Broadcast received:', data);
-  //   });
-  // }
   setupSocketConnection() {
-    const options = {
-      path: '/socketiochat/socket.io',
-      transports: ['polling', 'websocket'], // Try polling first
-      secure: true,
+    this.socket = io(environment.SOCKET_ENDPOINT, {
+      // secure: true,
+      // rejectUnauthorized: false,
+      path: '/chat/socket.io', // This should match the path in both API Gateway and backend
+      transports: ['websocket', 'polling'],
       withCredentials: true,
-      forceNew: true,
-      timeout: 10000,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    };
-    console.log('Connecting to:', environment.SOCKET_ENDPOINT);
-    this.socket = io(environment.SOCKET_ENDPOINT, options);
-
-    this.socket.on('connect', () => {
-      console.log('Connected to socket server with ID:', this.socket.id);
-    });
-
-    this.socket.on('connect_error', (error: any) => {
-      console.error('Connection error:', error);
-      // Try to reconnect with polling if websocket fails
-      if (this.socket.io.opts.transports.includes('websocket')) {
-        console.log('Falling back to polling transport');
-        this.socket.io.opts.transports = ['polling'];
-      }
-    });
-
-    this.socket.on('disconnect', (reason: string) => {
-      console.log('Disconnected:', reason);
     });
 
     // Listen for broadcast messages
@@ -61,7 +27,6 @@ export class SocketioService {
       console.log('Broadcast received:', data);
     });
   }
-
   onLowestBidUpdate(callback: (data: any) => void): void {
     this.socket.on('lowestBidUpdate', callback);
   }
