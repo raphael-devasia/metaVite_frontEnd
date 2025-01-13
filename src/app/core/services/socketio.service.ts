@@ -23,6 +23,7 @@ export class SocketioService {
     // });
 
 try {
+  
   this.socket = io('https://metavite.ddns.net', {
     path: '/chat/socket.io',
     secure: true,
