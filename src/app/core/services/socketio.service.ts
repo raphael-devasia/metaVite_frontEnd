@@ -25,23 +25,35 @@ export class SocketioService {
   //   });
   // }
   setupSocketConnection() {
-    this.socket = io(environment.SOCKET_ENDPOINT, {
-      path: '/socketiochat/socket.io', // Match the server path
-      transports: ['websocket', 'polling'],
+    const options = {
+      path: '/socketiochat/socket.io',
+      transports: ['polling', 'websocket'], // Try polling first
       secure: true,
-      rejectUnauthorized: false,
       withCredentials: true,
-      extraHeaders: {
-        'Access-Control-Allow-Origin': '*',
-      },
+      forceNew: true,
+      timeout: 10000,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    };
+
+    this.socket = io(environment.SOCKET_ENDPOINT, options);
+
+    this.socket.on('connect', () => {
+      console.log('Connected to socket server');
     });
 
     this.socket.on('connect_error', (error: any) => {
-      console.error('Socket connection error:', error);
+      console.error('Connection error:', error);
+      // Try to reconnect with polling if websocket fails
+      if (this.socket.io.opts.transports.includes('websocket')) {
+        console.log('Falling back to polling transport');
+        this.socket.io.opts.transports = ['polling'];
+      }
     });
 
-    this.socket.on('connect', () => {
-      console.log('Socket connected successfully');
+    this.socket.on('disconnect', (reason: string) => {
+      console.log('Disconnected:', reason);
     });
 
     // Listen for broadcast messages
