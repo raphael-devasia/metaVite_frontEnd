@@ -36,11 +36,11 @@ export class SocketioService {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     };
-
+    console.log('Connecting to:', environment.SOCKET_ENDPOINT);
     this.socket = io(environment.SOCKET_ENDPOINT, options);
 
     this.socket.on('connect', () => {
-      console.log('Connected to socket server');
+      console.log('Connected to socket server with ID:', this.socket.id);
     });
 
     this.socket.on('connect_error', (error: any) => {
