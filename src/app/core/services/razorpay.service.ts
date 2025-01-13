@@ -131,7 +131,7 @@ export class RazorpayService {
 
       return new Promise<boolean>((resolve, reject) => {
         const options = {
-          key: 'rzp_test_rPRBTE14c1zUpK',
+          key: 'rzp_test_3K6KzzVAPojIwq',
           amount: orderData.amount,
           currency: 'INR',
           order_id: orderData.receipt,
