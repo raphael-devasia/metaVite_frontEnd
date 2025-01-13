@@ -14,13 +14,40 @@ export class SocketioService {
   }
 
   setupSocketConnection() {
-    this.socket = io(environment.SOCKET_ENDPOINT, {
-      // secure: true,
-      // rejectUnauthorized: false,
-      path: '/chat/socket.io', // This should match the path in both API Gateway and backend
-      transports: ['websocket', 'polling'],
-      withCredentials: true,
-    });
+    // this.socket = io(environment.SOCKET_ENDPOINT, {
+    //   // secure: true,
+    //   // rejectUnauthorized: false,
+    //   path: '/chat/socket.io', // This should match the path in both API Gateway and backend
+    //   transports: ['websocket', 'polling'],
+    //   withCredentials: true,
+    // });
+
+try {
+  this.socket = io(environment.SOCKET_ENDPOINT, {
+    path: '/chat/socket.io',
+    secure: true,
+    rejectUnauthorized: false,
+    transports: ['websocket', 'polling'],
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    withCredentials: true,
+  });
+
+  // Add connection monitoring
+  this.socket.on('connect', () => {
+    console.log('Socket connected:', this.socket.id);
+  });
+
+  this.socket.on('connect_error', (error:any) => {
+    console.error('Socket connection error:', error);
+  });
+} catch (error) {
+  console.error('Setup error:', error);
+}
+
+
+
 
     // Listen for broadcast messages
     this.socket.on('my broadcast', (data: string) => {
