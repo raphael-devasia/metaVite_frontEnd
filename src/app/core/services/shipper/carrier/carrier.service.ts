@@ -40,7 +40,7 @@ export class CarrierService {
   //   return this.http.get(`${this.baseUrl}carrier/bids/${refId}`);
   // }
     getAllBids(refId: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}carrier/bids`);
+    return this.http.get(`${this.baseUrl}carrier/bids/admin`);
   }
   getActiveBids(refId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}carrier/active-bids/${refId}`);
