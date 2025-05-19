@@ -36,8 +36,11 @@ export class CarrierService {
     return this.http.get(`${this.baseUrl}carrier/clients/${userId}`);
   }
 
-  getAllBids(refId: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}carrier/bids/${refId}`);
+  // getAllBids(refId: string): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}carrier/bids/${refId}`);
+  // }
+    getAllBids(refId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}carrier/bids`);
   }
   getActiveBids(refId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}carrier/active-bids/${refId}`);
